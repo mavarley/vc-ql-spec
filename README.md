@@ -1,4 +1,5 @@
 ## Verifiable Credenitals Query Language 
+View the latest rendering here: https://mavarley.github.io/vc-ql-spec/
 
 This is the inital home of the Verifiable Credentials Query Language Specification.
 
