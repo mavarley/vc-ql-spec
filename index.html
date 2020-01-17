@@ -17,7 +17,7 @@
         specStatus: "CG-DRAFT",
 
         // the specification's short name, as in http://www.w3.org/TR/short-name/
-        shortName: "",
+        shortName: "vc-ql-spec",
 
         // subtitle
         subtitle: "How to ask for and receive Verifiable Credentials",
@@ -33,11 +33,11 @@
         // extend the bibliography entries
         localBiblio: ccg.localBiblio,
 
-        github: "https://github.com/w3c-ccg/",
+        github: "https://github.com/mavarley/vc-ql-spec/",
         includePermalinks: false,
 
         // if there a publicly available Editor's Draft, this is the link
-        edDraftURI: "https://w3c-ccg.github.io/",
+        edDraftURI: "https://mavarley.github.io/vc-ql-spec/",
 
         // if this is a LCWD, uncomment and set the end of its review period
         // lcEnd: "2009-08-05",
@@ -45,7 +45,7 @@
         // editors, add as many as you like
         // only "name" is required
         editors: [
-          { name: "Mike Varley", url: "https://www.linkedin.com/in/mavarley",
+          { name: "Mike Varley", email: "mike.varley@securekey.com",
             company: "SecureKey Technologies", companyURL: "https://www.securekey.com/" },
           
         ],
@@ -55,7 +55,7 @@
         // only "name" is required. Same format as editors.
         authors:
         [
-		  { name: "Mike Varley", url: "https://www.linkedin.com/in/mavarley",
+		  { name: "Mike Varley", email: "mike.varley@securekey.com",
             company: "SecureKey Technologies", companyURL: "https://www.securekey.com/" },
         ],
 
@@ -410,6 +410,7 @@
 	</li>
 	<li>JWS signature. A portable and popular payload protection standard for JSON protocols.</li>
 	<li>JWE encryption. A portable and popular payload encryption standard for JSON protocols.</li>
+	<li>All messages are encapsulated in a "vc-ql" JSON object.</li>
 </ul>
 </section>
 <section id="issuer-spec">
@@ -432,7 +433,7 @@
 		<dl>
 			<dt>type</dt>
 			<dd>
-				REQUIRED. MUST be set to "vc-issuer-invite".
+				REQUIRED. MUST be set to "issuer-invite".
 			</dd>
 			<dt>iss</dt>
 			<dd>
@@ -485,9 +486,9 @@
 	
 
 		<pre class="example no-highlight" title="Sample Issuer Invitiation">
-{
-	"type": "vc-issuer-invite",
-	"iss" : "did:example:47eydhger87ehdue8ehds",
+"vc-ql": {
+	"type": "issuer-invite",
+	"iss" : "did:example:IiI",
 	"enk": "did:key:z6eu48rjfdi39djdiod9de9wjwid9d",
 	"supportedvc" : [ "zkp", "ldsig", "jws", "jwsd" ],
 	"bindings": [
@@ -519,7 +520,7 @@
 		</p>
 		<ol class="algorithm">
 			<li>
-				MUST check the <code>type</code> is "vc-issuer-invite".
+				MUST check the <code>type</code> is "issuer-invite".
 			</li>
 			<li>
 				MUST verify the signature belongs to the <code>iss</code> by
@@ -547,49 +548,133 @@
 	<section id="issuer-spec-introduce">
 		<h2>Introduce</h2>
 		<p>
-			Holders send a <code>vc-introduce</code> message to provide
-			a subject identifier and associated key material for the issuer
-			to establish trust in the Holder.
+			Introduction is a request/response protocol message. Holders introduce
+			their subjects (and possibly themselves) to the Issuer, and the Issuer 
+			MUST indicate if the introduction was accepted, rejected, or needs 
+			more information.
 		</p>
-		<p>This message MUST be a JWS. The associated "kid" MUST be a DID 
-			signing key related to the subject identifier provided in the message.
-		</p>
+		<section id="issuer-spec-intro-req">
+			<h3>Introduction Request</h3>
+			<p>
+				Holders send a <code>issuer-introduce</code> message to provide
+				a subject identifier and associated key material for the issuer
+				to establish trust in the Holder.
+			</p>
+			<p>
+				This message MUST be a JWS. The associated "kid" MUST be a subject owned 
+				signing key related to the subject identifier provided in the message.
+			</p>
+			<dl>
+				<dt>type</dt>
+				<dd>REQUIRED. MUST be set to "issuer-introduce".</dd>
+				<dt>sub</dt>
+				<dd><p>
+					REQUIRED. The subject's Identifier for the Issuer and to be contained 
+					in the Verifiable Credentials as the <code>credentialSubject</code>.
+					</p>
+					<p class="issue">
+						Why am I using diffent terms then the Verifiable Credntials spec? 
+						The answer is 'brevity for low bandwidth Comm Channels' but is that valid?
+					</p>
+				</dd>
+				<dt>aud</dt>
+				<dd>REQUIRED. The issuer identifier URI.</dd>
+				<dt>enk</dt>
+				<dd>REQUIRED. The encryption key to use when sending encrypted payloads.
+					This MUST be assocaited to the <code>sub</code> URI - for example, 
+					a key defined in the DID Document.
+				</dd>
+				<dt>params</dt>
+				<dd>OPTIONAL. The Holder MAY provide additional parameters in this
+					introduction if the Holder knows a-priori that they will be required.
+					For example, attestations as to the type of software acting as a 
+					Holder, the contents of a <code>did:peer</code> document, etc... <em>TBD</em>
+				</dd>
+			</dl>
+
+			<pre class="example no-highlight" title="Isser Introduce message example">
+"vc-ql" : {
+	"type" : "issuer-introduce",
+	"sub" : "did:example:Udid99",
+	"aud" : "did:example:IiI",
+	"enk" : "did:example:Udid99#key-2",
+	"params" : { }
+}
+			</pre>
+			<p class="issue">Should this be "id" instead of "sub" ? </p>
+			<p class="issue">Should this be a JWE, or a JWS with the option of JWE if required?</p>
+			<p class="issue">How does this work with the concept of <code>handles</code> in OAuth "3" ?</p>
+			<p>When processing this <code>introduce</code> message the Issuer:</p>
+			<ol class="algorithm">
+				<li>MUST check the message type is <code>issuer-introduce</code>.</li>
+				<li>MUST ensure it is the owner of the <code>aud</code> URI.</li>
+				<li>MUST ensure the JWS/E header is using a <code>kid</code> associated to the <code>sub</code> URI.
+					For example, by dereferencing a DID and locating the key in the DID Document.
+				</li>
+				<li>MUST ignore the <code>params</code> field if no additonal parameters are expected.</li>
+				<li>If processing the <code>params</code> field, only process expected fields and MUST ignore others it does not recognize.</li>
+			</ol>
+		</section>
+		<section id="issuer-spec-intro-res">
+			<h3>Introduction Response</h3>
+			<p>
+				Issuers make a decision to proceed with the Holder based in the
+				contents and quality of the <code>issuer-introduce</code> request.
+			</p>
+			<p>
+				Issuers who are ready to proceed send back an <code>accepted</code>
+				response. Issuers that need more information send back a 
+				<code>continue</code> response. Issuers that cannot proceed send
+				back a <code>rejected</code> response. 
+			</p>
+			<p class="note">Currently I am leaving the synchronous/asynchronous message mapping to the Comm Channel, for example the DIDComm "~thread" field.</p>
+			
+			<p><code>accetped</code></p>
+
+			<pre class="example no-highlight" title="intro accepted response">
+"vc-ql: {
+	"type" : "issuer-introduce-accepted"
+}
+			</pre>
+			<p>
+				When a Holder receives an <code>accepted</code> response, they
+				MUST use the same <code>sub</code> identifier for the rest of 
+				this Issuance session.  
+			</p>
+
+			<p>continue</p>
+			<pre class="example no-highlight" title="intro accepted response">
+"vc-ql: {
+	"type" : "issuer-introduce-continue",
+	"params" : { }
+}
+			</pre>
+			<p>
+				When a Holder receives a <code>continue</code> response,
+				the Issuer is asking for more information to bootstrap
+				the trust in the Holder (not necessarily the Subject! 
+				Although in some use cases verifying the Subject may be 
+				efficient). The <code>params</code> will contain the Issuer
+				requirements. <em>TBD</em>.
+			</p>
+			<p>
+				Holders that are able to continue MUST re-issue a <code>issuer-introduce</code>
+				message with the continue parameters in the <code>params</code> section 
+				of the message. The Holder MUST use the same <code>sub</code> URI in the
+				subsequent message.
+			</p>
+
+		</section>
 	</section>
 
 </section>
 	
 	
 <hr/>
-<p>NEVERMIND THIS PART, just examples of markup I'm keeping for now</p>
-
-<p>
-	Sometimes we want <code> code()	</code> in text.
-</p>
-		
-
-<pre class="example nohighlight">
-{
-   "id": "did:example:123456789abcdefghi",
-   "type": "ProxyService",
-   "serviceEndpoint": "https://mydomain.com/proxy"
-}
-</pre>
-
-
-		<p class="note">
-			This is a note
-		</p>
-
-		<p class="issue">
-			TODO: 
-		</p>
-
-		<p>An algoritm:</p>
-\		<ol class="algorithm">
-			<li>Initialize a string <var>output <a>service endpoint</a> URL</var> to the value of the <var>input <a>service endpoint</a> URL</var></li>
-		</ol>
 
 <section id="security-privacy-considerations">
+<h2>Security Considerations</h2>
+<p>I'm sure it's fine.</p>
 </section>
 <section class="appendix">
 	<h1>Resources</h1>
