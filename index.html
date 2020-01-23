@@ -114,7 +114,7 @@
       <p>
       Portions of the work on this specification have been funded by the
       United States Department of Homeland Security's Science and Technology
-      Directorate under contracts HSHQDC-17-C-00019. The content of this
+      Directorate under contracts -------. The content of this
       specification does not necessarily reflect the position or the policy of
       the U.S. Government and no official endorsement should be inferred.
       </p>
@@ -260,11 +260,12 @@
 		The following diagram illustrates the message flow for request/issuance 
 		and request/presentation of Credentials. The flow is an extraction for 
 		the commonalities among the various considered <a>Comm Channels</a>. 
+	</p>
 	<p>
 		Dotted lines represent <em>optional</em> steps. All messages are
 		transport agnostic.
 	</p>
-	</p>
+
 	<figure id="figure-protocol-hlf-issue">
 		<img style="margin: auto; display: block; width: 100%;" src="diagrams/vc-protocol-hlf-issue.png"
 		alt="Credential Issuance High Level Message Flow.">
@@ -663,10 +664,170 @@
 				of the message. The Holder MUST use the same <code>sub</code> URI in the
 				subsequent message.
 			</p>
-
+			<p class="issue">
+				Does this protocl need the concept of DIDComm threading? Ideally Comm channels
+				can handle that... 
+			</p>
 		</section>
 	</section>
+	<section id="issue-bootstrap-trust">
+		<h2>Bootstrapping Trust</h2>
+		<p>
+			Bootstrapping trust refers to the exchange of messages required 
+			for the Issuer and Subject/Holder to establish the required trust
+			assurance to Issue (and accept) the Credential. A trivial example
+			would be in the case of a driver's license:
+		</p>
+		<ul>
+			<li>
+				How does the Subject and Holder trust they are getting a 
+				Credential from their DMV?
+			</li>
+			<li>
+				How does the DMV Issuer know it is issuing the credential to the
+				right Driver, and to a trusted Holder software product?  
+			</li>
+		</ul>
+		<p>
+			<em>Trust Frameworks</em> and their governance are outside the scope
+			of this specification. For the purposes of this specification it is
+			sufficient to note that profiles of this protocol MUST define the 
+			requirements of how trust is established between Issuer, Holder and
+			Subject before Issuance can occur.
+		</p>
+		<p>
+			Examples include the use of TLS certificates, providing Verifiable
+			Credenitals issued from a shared Trust authority, providing 
+			attestation certificates such as in [[Web AuthN]], the exchange of
+			shared secrets or other credentials, or even in-person, physical trust
+			establishment (like a certification sticker on a barcode reader).
+		</p>
+	</section>
+	<section id="issue-create-cred">
+		<h2>Create Credenital</h2>
+		<p>
+			This is a message for a Holder to request a credential of a certain
+			type from an Issuer. This message is OPTIONAL in a workflow. 
+		</p>
+		<p>
+			In workflows where a Holder is actively trying to collect credentials
+			from Issuers and the Comm Channel allows for the Issuer to reach
+			out to the Issuer, this message MAY be used. This message MAY be used
+			in scenarios where additonal Holder to Issuer messages are required
+			to generate the Credential, for example in Zero Knowledge Proof 
+			scenarios.
+		</p>
+		<p>
+			In workflows where the Issuer is interacting with the user and then
+			offers to provide a Credenital to the user's Holder, for example
+			at a physical kiosk or a website, the Issuer may interact with the user
+			to determin the parameters of the Credenital it is willing to issue,
+			then skip right to the Store Credential message.
+		</p>
+		<section id="issue-create-cred-req">
+			<h3>Create Credential Request</h3>
+			<p>
+				Holders send a <code>issue-credential-request</code> to
+				collect a Credential from an Issuer. Holders MAY request multiple
+				Credenitals in a single message. 
+			</p>
+			<p>
+				Message MUST be a JWS. The JWS "kid" MUST be a key owned by the
+				<code>sub</code> Holder.
+			</p>
+			<dl>
+				<dt>type</dt>
+				<dd>REQUIRED. MUST be set to <code>issue-credential-request</code>.</dd>
+			</dl>
 
+			<dt>sub</dt>
+			<dd>
+				REQUIRED. MUST be the Subject of the Credential, represented by the Holder.
+				This MUST be an identifier already known to the Issuer through a
+				<code>issuer-introduce</code> message. The Holder MUST provide
+				"proof" it represents this Subject (see JWS requirement above).
+			</dd>
+			
+			<dt>aud</dt>
+			<dd>
+				REQUIRED. MUST be the URI of the Issuer "trusted" of during the
+				<a href="#issue-bootstrap-trust"></a> stage.
+			</dd>
+			
+			<dt>credentials</dt>
+			<dd>
+				<p>REQUIRED. A non-empty array of credential types the Holder is requesting.</p>
+				<dl>
+					<dt>type</dt>
+					<dd>An array of Credential type definitions that will match the Verifiable Credential <code>type</code> field.</dd>
+					<dt>id</dt>
+					<dd>The Holder ID requesting this Credential be issued to. MUST be linked to the <code>sub</code>.</dd>
+				</dl>
+			</dd>
+			<dd>
+				<dt>params</dt>
+				<dd>Any additional parameters or custom extentions required to issue the credential.</dd>
+			</dd>
+			
+			<pre class="example no-highlight" title="intro accepted response">
+"vc-ql: {
+	"type" : "issue-credential-request",
+	"sub" : "did:example:Udid99",
+	"aud" : "did:example:IiI",
+	"credentials" : [ 
+		{ 
+			"type" : [ "VerifiableCredential", "UniversityDegree" ],
+			"id" : "did:example:Udid99"
+		},
+		{
+			"type" : [ "VerifiableCredential", "UniversityTranscript" ],
+			"id" : "did:example:Udid99"
+		}
+	 ],
+	 "params" : { }
+}
+			</pre>
+			<p class="issue">
+				should "sub" be "id" ?
+			</p>
+			<p class="issue">
+				should "VerifiableCredentrial" type be implied ? its in the protocol name, after all ...
+			</p>
+			<p class="issue">
+				credentials may have different DIDs for privacy and unlink-ability... how does an Issuer link the DIDs "together" ?
+				Do we need multiplicity in the <code>isser-introduce</code> message?
+			</p>
+			<p>
+				Issuers process the <code>create-credential-request</code> message as follows:
+			</p>
+			<ol>
+				<li><code>type</code> MUST be <code>issue-credential-request</code>.</li>
+				<li><code>sub</code> MUST be known to the Issuer through an <code>issuer-introduce</code> message.</li>
+				<li><code>aud</code> Issuer MUST be a controller of the identifier URI.</li>
+				<li><code>credentials</code> MUST not be empty.</li>
+				<li><code>credentials.type</code> MUST contain <code>VerifiableCredential</code></li>
+				<li><code>credential.type</code> MUST contain only Credential schemas supported by the Issuer.</li>
+				<li><code>credential.id</code> MUST be a URI <em>controlled</em> by the Holder and linked to the <code>sub</code>.</li>
+				<li>The Issuer MUST ignore any <code>params</code> it does not recognize.</li>
+			</ol>
+			<p>
+				Issuers MUST determin if there is enough "trust" in the Holder 
+				(either through this session or a previous session) to issue the requested
+				credentials. 
+			</p>
+			<p>
+				Issuer MUST determin if they have enough information from the Subject or Holder
+				to issue the credential, or if additonal data is required. If the Issuer requires
+				more information, it MAY return a <code>issue-credential-params</code> response
+				or an <code>issue-credential-error</code> response and collect more information
+				out-of-band from this protocol.
+			</p>
+			<p>
+				Issuers MUST determin if their own internal policies, and those of their 
+				trust framework, are met for Credential issuance.
+			</p>
+		</section>
+	</section>
 </section>
 	
 	
