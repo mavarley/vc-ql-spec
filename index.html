@@ -229,12 +229,10 @@
 	This specification makes use of the terms defined in Verified Credenitals
 	Data Model v1.0 and defines the additonal terms:
     <dl>
-      <dt><dfn>Binding</dfn></dt>
-	  <dd>A concrete mechanism through which a <a>Holder</a> invokes a 
-		<a>Comm Channel</a>. For example, the <a href="#bindings-https">HTTP(S) Binding</a>.</dd>
-	</dl>
-	<dl>
-		<dt><dfn>Comm Channel</dfn></dt>
+    	<dt><dfn>Binding</dfn></dt>
+	  	<dd>A concrete mechanism through which a <a>Holder</a> invokes a 
+			<a>Comm Channel</a>. For example, the <a href="#bindings-https">HTTP(S) Binding</a>.</dd>
+	  	<dt><dfn>Comm Channel</dfn></dt>
 		<dd>A 'transport protocol' for enabling the transfer of Verifiable 
 			Credentials and other data. These Comm Channels may enable other 
 			processing capabilities for DIDs and Verifiable Credentials 
@@ -243,15 +241,22 @@
 			stack, and must not be confused with lower level packet transport
 			protocols.
 		</dd>
-	</dl>
-	<dl>
+		<dt><dfn>Controller</dfn></dt>
+		<dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
 		<dt><dfn>Duplex</dfn></dt>
 		<dd>A 'two-way' message. This message type has a request and and expected response.</dd>
-	</dl>
-	<dl>
+		<dt><dfn>Holder</dfn></dt>
+		<dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+		<dt><dfn>Issuer</dfn></dt>
+		<dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
 		<dt><dfn>Simplex</dfn></dt>
 		<dd>A 'one-way' message. This message does not have a defined response from the receiver.</dd>
+		<dt><dfn>Subject</dfn></dt>
+		<dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+		<dt><dfn>Verifier</dfn></dt>
+		<dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
 	</dl>
+
 </section>
 
 <section id="hlprotocol">
@@ -452,10 +457,10 @@
 				REQUIRED. MUST be a public key the Holder can use to encrypt
 				messages to the Issuer. This MAY be a JWK or a <code>did:key:...</code>
 			</dd>
-			<dt>supportedvc</dt>
+			<dt>proofs</dt>
 			<dd>
 				<p>
-				REQUIRED. An array of the flavours of Verifiable Credential
+				REQUIRED. An array of the supported formats of Verifiable Credential
 				proof algorithms the issuer is able to support. This MUST contain one of:
 				</p>
 				<ul>
@@ -474,9 +479,9 @@
 					Bindings may not make sense; this may be something that comes across in the DID Document.
 				</p>
 			</dd>
-			<dt>schemas</dt>
+			<dt>credentials</dt>
 			<dd><p>
-				REQUIRED. An array of schema definition DIDs. Schemas defined by URLs MUST used the 
+				REQUIRED. An array of credential types / schema definition DIDs. Schemas defined by URLs MUST used the 
 				<code>did:web:</code> method.
 				</p>
 				<p class="issue">
@@ -491,14 +496,14 @@
 	"type": "issuer-invite",
 	"iss" : "did:example:IiI",
 	"enk": "did:key:z6eu48rjfdi39djdiod9de9wjwid9d",
-	"supportedvc" : [ "zkp", "ldsig", "jws", "jwsd" ],
+	"proofs" : [ "zkp", "ldsig", "jws", "jwsd" ],
 	"bindings": [
 		{ "scheme": "https", "params" : { "endpoint: "https://issuer.org/request"} },
 		{ "scheme": "didcomm", "params" : { "@type" : "https://didcomm.org/didexchange/1.0/invitation", ...} },
 		{ "scheme": "oauth3", "params" : { "txnreq" : "https://issuer.org/oauth3/req"}},
 		{ "scheme": "js-inline"}
 	],
-	"schemas": [ "did:web:https://schema.org/Person" ]
+	"credentials": [ "did:web:https://schema.org/Person" ]
 }
 		</pre>
 		<p class="issue">
@@ -531,7 +536,7 @@
 			<li>MUST process the <code>enk</code> as an algorithm the Holder
 				can support and the key is valid.
 			</li>
-			<li>MUST process the <code>supportedvc</code> list to ensure the 
+			<li>MUST process the <code>proofs</code> list to ensure the 
 				Holder can support at least one format. If the Holder is unable
 				to support at least one format, the Holder MUST inform the user
 				of the error and stop processing.
@@ -542,7 +547,7 @@
 				compatible binding, the Holder MUST inform the user of the error
 				and stop processing.
 			</li>
-			<li>MUST process the <code>schemas</code> array and determin if those
+			<li>MUST process the <code>credentials</code> array and determin if those
 			    Credential types are applicable for the Holder.</li>
 		</ol>
 	</section>
@@ -633,7 +638,7 @@
 			<p><code>accetped</code></p>
 
 			<pre class="example no-highlight" title="intro accepted response">
-"vc-ql: {
+"vc-ql": {
 	"type" : "issuer-introduce-accepted"
 }
 			</pre>
@@ -644,8 +649,8 @@
 			</p>
 
 			<p>continue</p>
-			<pre class="example no-highlight" title="intro accepted response">
-"vc-ql: {
+			<pre class="example no-highlight" title="intro continue response">
+"vc-ql": {
 	"type" : "issuer-introduce-continue",
 	"params" : { }
 }
@@ -711,7 +716,7 @@
 		</p>
 		<p>
 			In workflows where a Holder is actively trying to collect credentials
-			from Issuers and the Comm Channel allows for the Issuer to reach
+			from Issuers and the Comm Channel allows for the Holder to reach
 			out to the Issuer, this message MAY be used. This message MAY be used
 			in scenarios where additonal Holder to Issuer messages are required
 			to generate the Credential, for example in Zero Knowledge Proof 
@@ -738,53 +743,54 @@
 			<dl>
 				<dt>type</dt>
 				<dd>REQUIRED. MUST be set to <code>issue-credential-request</code>.</dd>
+			
+				<dt>sub</dt>
+				<dd>
+					REQUIRED. MUST be the Subject of the Credential, represented by the Holder.
+					This MUST be an identifier already known to the Issuer through a
+					<code>issuer-introduce</code> message. The Holder MUST provide
+					"proof" it represents this Subject (see JWS requirement above).
+				</dd>
+			
+				<dt>aud</dt>
+				<dd>
+					REQUIRED. MUST be the URI of the Issuer "trusted" of during the
+					<a href="#issue-bootstrap-trust"></a> stage.
+				</dd>
+				
+				<dt>credentials</dt>
+				<dd>
+					<p>REQUIRED. A non-empty array of credential types the Holder is requesting.</p>
+					<dl>
+						<dt>type</dt>
+						<dd>REQUIRED. A non-empty array of Credential type definitions that will match the Verifiable Credential <code>type</code> field.</dd>
+						<dt>id</dt>
+						<dd>REQUIRED. The Holder ID requesting this Credential be issued to. MUST be linked to the <code>sub</code>.</dd>
+						<dt>params</dt>
+						<dd>OPTIONAL. Any additional parameters or custom extentions required to issue the credential. This SHOULD contains the result to any previous <code>issue-credential-params</code> response message.</dd>
+		
+					</dl>
+				</dd>
 			</dl>
-
-			<dt>sub</dt>
-			<dd>
-				REQUIRED. MUST be the Subject of the Credential, represented by the Holder.
-				This MUST be an identifier already known to the Issuer through a
-				<code>issuer-introduce</code> message. The Holder MUST provide
-				"proof" it represents this Subject (see JWS requirement above).
-			</dd>
-			
-			<dt>aud</dt>
-			<dd>
-				REQUIRED. MUST be the URI of the Issuer "trusted" of during the
-				<a href="#issue-bootstrap-trust"></a> stage.
-			</dd>
-			
-			<dt>credentials</dt>
-			<dd>
-				<p>REQUIRED. A non-empty array of credential types the Holder is requesting.</p>
-				<dl>
-					<dt>type</dt>
-					<dd>An array of Credential type definitions that will match the Verifiable Credential <code>type</code> field.</dd>
-					<dt>id</dt>
-					<dd>The Holder ID requesting this Credential be issued to. MUST be linked to the <code>sub</code>.</dd>
-				</dl>
-			</dd>
-			<dd>
-				<dt>params</dt>
-				<dd>Any additional parameters or custom extentions required to issue the credential.</dd>
-			</dd>
-			
+		</dl>
 			<pre class="example no-highlight" title="intro accepted response">
-"vc-ql: {
+"vc-ql": {
 	"type" : "issue-credential-request",
 	"sub" : "did:example:Udid99",
 	"aud" : "did:example:IiI",
+	"proof" : "ld-proof",
 	"credentials" : [ 
 		{ 
 			"type" : [ "VerifiableCredential", "UniversityDegree" ],
-			"id" : "did:example:Udid99"
+			"id" : "did:example:Udid99",
+			"params" : { } 
 		},
 		{
 			"type" : [ "VerifiableCredential", "UniversityTranscript" ],
-			"id" : "did:example:Udid99"
+			"id" : "did:example:Udid99",
+			"params" : { }
 		}
-	 ],
-	 "params" : { }
+	 ]
 }
 			</pre>
 			<p class="issue">
@@ -798,7 +804,7 @@
 				Do we need multiplicity in the <code>isser-introduce</code> message?
 			</p>
 			<p>
-				Issuers process the <code>create-credential-request</code> message as follows:
+				Issuers process the <code>issue-credential-request</code> message as follows:
 			</p>
 			<ol>
 				<li><code>type</code> MUST be <code>issue-credential-request</code>.</li>
@@ -808,7 +814,7 @@
 				<li><code>credentials.type</code> MUST contain <code>VerifiableCredential</code></li>
 				<li><code>credential.type</code> MUST contain only Credential schemas supported by the Issuer.</li>
 				<li><code>credential.id</code> MUST be a URI <em>controlled</em> by the Holder and linked to the <code>sub</code>.</li>
-				<li>The Issuer MUST ignore any <code>params</code> it does not recognize.</li>
+				<li>The Issuer MUST ignore any <code>credential.params</code> it does not recognize.</li>
 			</ol>
 			<p>
 				Issuers MUST determin if there is enough "trust" in the Holder 
@@ -817,7 +823,9 @@
 			</p>
 			<p>
 				Issuer MUST determin if they have enough information from the Subject or Holder
-				to issue the credential, or if additonal data is required. If the Issuer requires
+				to issue the credential, or if additonal data is required. If the Issuer is 
+				ready to issue the credential, it MAY respond with a <code>issue-credential-store</code>
+				response. If the Issuer requires
 				more information, it MAY return a <code>issue-credential-params</code> response
 				or an <code>issue-credential-error</code> response and collect more information
 				out-of-band from this protocol.
@@ -825,6 +833,47 @@
 			<p>
 				Issuers MUST determin if their own internal policies, and those of their 
 				trust framework, are met for Credential issuance.
+			</p>
+		</section>
+		<section id="issue-create-cred-res">
+			<h3>Issue Credential Parameters</h3>
+			<p>
+				This message is used by both Holders and Issuers to specify additional
+				parameters either required or available to issue the credential.
+			</p>
+			<p>
+				Parameters may include cryptographic materials, additional Credentials 
+				or trust bootstrapping, user interaction or user agent parameters.
+			</p>
+			<pre class="example no-highlight" title="intro accepted response">
+"vc-ql": {
+	"type" : "issue-credentials-params",
+	"aud" : "did:example:Udid99",
+	"iss" : "did:example:IiI",
+	"credentials" : [ 
+		{ 
+			"type" : [ "VerifiableCredential", "UniversityDegree" ],
+			"id" : "did:example:Udid99",
+			"params" : { 
+				"myparam1" : { "type: : "present-credential-request", ... }
+			} 
+		},
+		{
+			"type" : [ "VerifiableCredential", "UniversityTranscript" ],
+			"id" : "did:example:Udid99",
+			"params" : { 
+				"redirect" : { "type" : "url_interaction", ... } 
+			}
+		}
+	 ]
+}
+			</pre>
+			<p>
+				The params response is another issue-credential-request with the
+				param results provided in the same field/key. For example, 
+				"myparam1" would contain the Verifiable Presentation - 
+				"redirect" would contain the result from the URL redirect, and
+				so on.
 			</p>
 		</section>
 	</section>
