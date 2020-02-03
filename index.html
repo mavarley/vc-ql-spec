@@ -55,7 +55,7 @@
         // only "name" is required. Same format as editors.
         authors:
         [
-		  { name: "Mike Varley", email: "mike.varley@securekey.com",
+          { name: "Mike Varley", email: "mike.varley@securekey.com",
             company: "SecureKey Technologies", companyURL: "https://www.securekey.com/" },
         ],
 
@@ -96,8 +96,8 @@
   <body>
     <section id='abstract'>
       <p>
-		  A common protocol for decentralized entities to exchange 
-		  Verifiable Credentials across various communcation channels.
+          A common protocol for decentralized entities to exchange 
+          Verifiable Credentials across various communcation channels.
       </p>
     </section>
 
@@ -120,878 +120,878 @@
       </p>
 
       <p>
-	  Work on this specification has also been supported by the Department of
-	  Homeland Security SVIP program, the Decenralized Identity Foundation (hopefully)
-	  and the Hyperledger Aries community (blockcert?).
+      Work on this specification has also been supported by the Department of
+      Homeland Security SVIP program, the Decenralized Identity Foundation (hopefully)
+      and the Hyperledger Aries community (blockcert?).
       </p>
     </section>
 
 <section id="introduction">
 <h1>Introduction</h1>
 
-	<p>
-		The objective of this specification is to define a common, minimalist message 
-		protocol for Issuers, Holders and Verifiers for the purpose of requesting
-		and exchanging W3C Verifiable Credenitals and Presentations across technology
-		boundaries.
-	</p>
-	<p>
-		This protocol is meant to be transport agnostic; certainly it must 
-		operate in Web based scenarios, but it also must be compatible in 
-		offline (sometimes even connection-less) scenarios. Therefore this
-		specification will first define the messages, and then later in the
-		document various <em>bindings</em> will be defined.
-	</p>
-	<p>
-		There are currently multiple standard (and developing standard) 
-		protocols for facilitating the actual transfer of Verifiable Credential
-		data, for example Aries DIDComm and the Credential Handler API (CHAPI),
-		and more popular frameworks like OAuth and OpenID Connect may also be
-		used. Most of these protocols provide a high degree of flexibility in
-		there message structure, making them useful beyond Verifiable 
-		Credentials. This protocol will therefore treat these generic transfer
-		teschnologies as <em>Communication Channels</em> - or 'pipes' for 
-		facilitating message transfer. This will allow developers to build
-		Verifiable Credential based systems in a way that they are guaranteed
-		some level of interoperability decoupled from more feature rich protocols
-		and technology stacks.    
-	</p>
-	<p>
-		The goal of this specification is to define a common message structure
-		so that Issuers, Holders, and Verifiers can exchange Verifiable 
-		Credentials <em>across</em> these Comm Channels: entities using the 
-		same Comm Channel can operate over that channel, and entities integrated
-		to different channels may rely on 'adapter' software to pass these 
-		messages across those channels; and still process the request/response
-		to exchange credentials. Sessions may even initiate on one channel and
-		transfer to another during the course of the communication.    
-	</p>
-	<p>
-		This protocol takes into account and aims to be interoperable with
-		the following:
-		<ul>
-			<li>Verifiable Credentials v1.0 proof formats: LD-Signatures, 
-				ZKP, and JWS.</li>
-			<li>Credential Handler API browser extention.</li>
-			<li>Hyperledger Aries DIDComm.</li>
-			<li>OAuth "3" transactional authorization.</li>
-			<li>Blockcert ...?</li>
-			<li>did:key method.</li>
-			<li>did:peer method.</li>
-			<li>JSON Web suite of specifications (JW*), including JWM ?</li>
-			<li>DID Resolver protocol.</li>
-			<li>ISO/IEC TC JTC1/SC 17 N Mobile Drivers license specification.</li>
-		</ul>
+    <p>
+        The objective of this specification is to define a common, minimalist message 
+        protocol for Issuers, Holders and Verifiers for the purpose of requesting
+        and exchanging W3C Verifiable Credenitals and Presentations across technology
+        boundaries.
+    </p>
+    <p>
+        This protocol is meant to be transport agnostic; certainly it must 
+        operate in Web based scenarios, but it also must be compatible in 
+        offline (sometimes even connection-less) scenarios. Therefore this
+        specification will first define the messages, and then later in the
+        document various <em>bindings</em> will be defined.
+    </p>
+    <p>
+        There are currently multiple standard (and developing standard) 
+        protocols for facilitating the actual transfer of Verifiable Credential
+        data, for example Aries DIDComm and the Credential Handler API (CHAPI),
+        and more popular frameworks like OAuth and OpenID Connect may also be
+        used. Most of these protocols provide a high degree of flexibility in
+        there message structure, making them useful beyond Verifiable 
+        Credentials. This protocol will therefore treat these generic transfer
+        teschnologies as <em>Communication Channels</em> - or 'pipes' for 
+        facilitating message transfer. This will allow developers to build
+        Verifiable Credential based systems in a way that they are guaranteed
+        some level of interoperability decoupled from more feature rich protocols
+        and technology stacks.    
+    </p>
+    <p>
+        The goal of this specification is to define a common message structure
+        so that Issuers, Holders, and Verifiers can exchange Verifiable 
+        Credentials <em>across</em> these Comm Channels: entities using the 
+        same Comm Channel can operate over that channel, and entities integrated
+        to different channels may rely on 'adapter' software to pass these 
+        messages across those channels; and still process the request/response
+        to exchange credentials. Sessions may even initiate on one channel and
+        transfer to another during the course of the communication.    
+    </p>
+    <p>
+        This protocol takes into account and aims to be interoperable with
+        the following:
+        <ul>
+            <li>Verifiable Credentials v1.0 proof formats: LD-Signatures, 
+                ZKP, and JWS.</li>
+            <li>Credential Handler API browser extention.</li>
+            <li>Hyperledger Aries DIDComm.</li>
+            <li>OAuth "3" transactional authorization.</li>
+            <li>Blockcert ...?</li>
+            <li>did:key method.</li>
+            <li>did:peer method.</li>
+            <li>JSON Web suite of specifications (JW*), including JWM ?</li>
+            <li>DID Resolver protocol.</li>
+            <li>ISO/IEC TC JTC1/SC 17 N Mobile Drivers license specification.</li>
+        </ul>
 
-	</p>
-	<p>
-		Out of scope for this specification are the details of how various 
-		technologies make use of Encrypted Data Vaults, message routing or 
-		proxying, multi-party (3+) extentitions, and Verifiable Presentation
-		privacy considerations (unless they are part of the message structure).
-	</p>
-	<p>
-		Note it is also possible that during the course of this messaging 
-		entities may determin they cannot interoperate due to the nature of the
-		schemas and formats of the Verifiable Credentials being exchanged; this
-		is an unfortuante but acceptable outcome. For example, a Holder simply
-		may not have the Credentials matching the requested Schema by the 
-		Verifier. The Issuer may not be able to support a particular signing 
-		algortithm required by the Holder. C'est la vie.
-	</p>
-	<section>
-		<h2>Layering</h2>
-		<p>
-			This protocol specification is meant to sit atop the Verifiable Credentials 
-			v1.0 data format, the various Communication technologies and the transport
-			layers. The following diagram is a visual (but not exhaustive) representation
-			of how the various components in a Decentralized Identity ecosystem fit. 
-			Your milage may vary. 
-		</p>
-		<figure id="figure-protocol-stack">
-			<img style="margin: auto; display: block; width: 100%;" src="diagrams/vc-protocol-stack.png"
-			alt="Protocol Stack.">
-			<figcaption style="text-align: center;">
-				The Protocol Stack or Layering.
-			</figcaption>
-		</figure>
-		<P>
-			When the protocol can be used in conjunction with a particular message
-			transport technology, this is referred to as a <em>binding.</em> Sample 
-			bindings are included in the Annex, and may be expressed as separate specs.
-		</P>
-	</section>
-	<section id="conformance">
+    </p>
+    <p>
+        Out of scope for this specification are the details of how various 
+        technologies make use of Encrypted Data Vaults, message routing or 
+        proxying, multi-party (3+) extentitions, and Verifiable Presentation
+        privacy considerations (unless they are part of the message structure).
+    </p>
+    <p>
+        Note it is also possible that during the course of this messaging 
+        entities may determin they cannot interoperate due to the nature of the
+        schemas and formats of the Verifiable Credentials being exchanged; this
+        is an unfortuante but acceptable outcome. For example, a Holder simply
+        may not have the Credentials matching the requested Schema by the 
+        Verifier. The Issuer may not be able to support a particular signing 
+        algortithm required by the Holder. C'est la vie.
+    </p>
+    <section>
+        <h2>Layering</h2>
+        <p>
+            This protocol specification is meant to sit atop the Verifiable Credentials 
+            v1.0 data format, the various Communication technologies and the transport
+            layers. The following diagram is a visual (but not exhaustive) representation
+            of how the various components in a Decentralized Identity ecosystem fit. 
+            Your milage may vary. 
+        </p>
+        <figure id="figure-protocol-stack">
+            <img style="margin: auto; display: block; width: 100%;" src="diagrams/vc-protocol-stack.png"
+            alt="Protocol Stack.">
+            <figcaption style="text-align: center;">
+                The Protocol Stack or Layering.
+            </figcaption>
+        </figure>
+        <P>
+            When the protocol can be used in conjunction with a particular message
+            transport technology, this is referred to as a <em>binding.</em> Sample 
+            bindings are included in the Annex, and may be expressed as separate specs.
+        </P>
+    </section>
+    <section id="conformance">
 
-	</section>
+    </section>
 
 </section>
 
 <section id="terminology">
-	<h1>Terminology</h1>
+    <h1>Terminology</h1>
 
-	This specification makes use of the terms defined in Verified Credenitals
-	Data Model v1.0 and defines the additonal terms:
+    This specification makes use of the terms defined in Verified Credenitals
+    Data Model v1.0 and defines the additonal terms:
     <dl>
-    	<dt><dfn>Binding</dfn></dt>
-	  	<dd>A concrete mechanism through which a <a>Holder</a> invokes a 
-			<a>Comm Channel</a>. For example, the <a href="#bindings-https">HTTP(S) Binding</a>.
-		</dd>
-		<dt><dfn>claim</dfn></dt>
-		<dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
-		<dt><dfn>Comm Channel</dfn></dt>
-		<dd>A 'transport protocol' for enabling the transfer of Verifiable 
-			Credentials and other data. These Comm Channels may enable other 
-			processing capabilities for DIDs and Verifiable Credentials 
-			beyond this specification. In this context these Comm Channels
-			may already be sophistcated application protocols high on the OSI
-			stack, and must not be confused with lower level packet transport
-			protocols.
-		</dd>
-		<dt><dfn>Controller</dfn></dt>
-		<dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
-		<dt><dfn>Duplex</dfn></dt>
-		<dd>A 'two-way' message. This message type has a request and and expected response.</dd>
-		<dt><dfn>Holder</dfn></dt>
-		<dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
-		<dt><dfn>Issuer</dfn></dt>
-		<dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
-		<dt><dfn>property</dfn></dt>
-		<dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
-		<dt><dfn>Simplex</dfn></dt>
-		<dd>A 'one-way' message. This message does not have a defined response from the receiver.</dd>
-		<dt><dfn>Subject</dfn></dt>
-		<dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
-		<dt><dfn>Verifiable Credential</dfn></dt>
-		<dd>See Verfiable Credentials Data Model 1.0 spec.</dd>
-		<dt><dfn>Verifier</dfn></dt>
-		<dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
-	</dl>
+        <dt><dfn>Binding</dfn></dt>
+        <dd>A concrete mechanism through which a <a>Holder</a> invokes a 
+            <a>Comm Channel</a>. For example, the <a href="#bindings-https">HTTP(S) Binding</a>.
+        </dd>
+        <dt><dfn>claim</dfn></dt>
+        <dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+        <dt><dfn>Comm Channel</dfn></dt>
+        <dd>A 'transport protocol' for enabling the transfer of Verifiable 
+            Credentials and other data. These Comm Channels may enable other 
+            processing capabilities for DIDs and Verifiable Credentials 
+            beyond this specification. In this context these Comm Channels
+            may already be sophistcated application protocols high on the OSI
+            stack, and must not be confused with lower level packet transport
+            protocols.
+        </dd>
+        <dt><dfn>Controller</dfn></dt>
+        <dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+        <dt><dfn>Duplex</dfn></dt>
+        <dd>A 'two-way' message. This message type has a request and and expected response.</dd>
+        <dt><dfn>Holder</dfn></dt>
+        <dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+        <dt><dfn>Issuer</dfn></dt>
+        <dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+        <dt><dfn>property</dfn></dt>
+        <dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+        <dt><dfn>Simplex</dfn></dt>
+        <dd>A 'one-way' message. This message does not have a defined response from the receiver.</dd>
+        <dt><dfn>Subject</dfn></dt>
+        <dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+        <dt><dfn>Verifiable Credential</dfn></dt>
+        <dd>See Verfiable Credentials Data Model 1.0 spec.</dd>
+        <dt><dfn>Verifier</dfn></dt>
+        <dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+    </dl>
 
 </section>
 
 <section id="hlprotocol">
-	<h1>High Level Protocol</h1>
-	<p>
-		The following diagram illustrates the message flow for request/issuance 
-		and request/presentation of Credentials. The flow is an extraction for 
-		the commonalities among the various considered <a>Comm Channels</a>. 
-	</p>
-	<p>
-		Dotted lines represent <em>optional</em> steps. All messages are
-		transport agnostic.
-	</p>
+    <h1>High Level Protocol</h1>
+    <p>
+        The following diagram illustrates the message flow for request/issuance 
+        and request/presentation of Credentials. The flow is an extraction for 
+        the commonalities among the various considered <a>Comm Channels</a>. 
+    </p>
+    <p>
+        Dotted lines represent <em>optional</em> steps. All messages are
+        transport agnostic.
+    </p>
 
-	<figure id="figure-protocol-hlf-issue">
-		<img style="margin: auto; display: block; width: 100%;" src="diagrams/vc-protocol-hlf-issue.png"
-		alt="Credential Issuance High Level Message Flow.">
-		<figcaption style="text-align: center;">
-			Credential Issuance High Level Message Flow.
-		</figcaption>
-	</figure>
-	<p>
-	</p>
-	<section id="hl-issuance">
-		<h2>Issuance Flow</h2>
-		<dl>
-			<dt>Invite Message (simplex) (optional)</dt>
-			<dd>An entity is willing to provide verifiable credentials to qualified
-				Holders. The Invitation message allows Holders to 'discover' how to 
-				communicate with an Issuer. "I invite Holders to Introduce themselves in 
-				this way."</dd>
+    <figure id="figure-protocol-hlf-issue">
+        <img style="margin: auto; display: block; width: 100%;" src="diagrams/vc-protocol-hlf-issue.png"
+        alt="Credential Issuance High Level Message Flow.">
+        <figcaption style="text-align: center;">
+            Credential Issuance High Level Message Flow.
+        </figcaption>
+    </figure>
+    <p>
+    </p>
+    <section id="hl-issuance">
+        <h2>Issuance Flow</h2>
+        <dl>
+            <dt>Invite Message (simplex) (optional)</dt>
+            <dd>An entity is willing to provide verifiable credentials to qualified
+                Holders. The Invitation message allows Holders to 'discover' how to 
+                communicate with an Issuer. "I invite Holders to Introduce themselves in 
+                this way."</dd>
 
-			<dt>Introduce Message (duplex)</dt>
-			<dd>Holders Introduce themselves to Issuers by providing details about 
-				"who they are" and "how to communicate with them" - Identity and 
-				Location.
-			</dd>
-			<dt>Bootstrap Trust</dt>
-			<dd>Holders and Issuers go through a process of establishing a Trust
-				relationship. Examples include trusted TLS certificates in HTTPS
-				protocols, Verifiable Credential exchange, or physical (in person)
-				trust. 
-			</dd>
-			<dt>Create Credential (duplex)</dt>
-			<dd>The Holder is requesting a Credential of a certain type, schema, 
-				and format. The Issuer processes the request and returns the 
-				Credential if possible. This message may be implied by the Issuer
-				as Credential parameters may be determined out-of-band of this 
-				protocol (through user experience, for example).
-			</dd>
-			<dt>Credential Params (duplex)</dt>
-			<dd>This message may be sent if in order to create a credential an 
-				Issuer and Holder need exchange additional information. This message
-				MAY be sent in response to either Create Credential or Store 
-				Credential messages, and MAY be exchanged as many times as necessary. 
-			</dd>
-			<dt>Store Credential (duplex)</dt>
-			<dd>The Issuer is ready to provide a Verifiable Credential for use/storage
-				at the Holder. The Holder can accept the Credenital, or provide back 
-				a Credential Params response if neccessary (for example,
-				extra data to create the necessary cryptographic proofs).
-			</dd>
-		</dl>
-	</section>
-	<section id="hl-presentation">
-		<h2>Presentation Flow</h2>
-		<figure id="figure-protocol-hlf-present">
-			<img style="margin: auto; display: block; width: 100%;" src="diagrams/vc-protocol-hlf-present.png"
-			alt="Credential Presentaion High Level Message Flow.">
-			<figcaption style="text-align: center;">
-				Credential Presentation High Level Message Flow.
-			</figcaption>
-		</figure>
-		
-		<dl>
-			<dt>Presentation Request (simplex)</dt>
-			<dd>The Verifier makes a Presentation Request with the desired
-				parameters to the Holder. A Presentation Request message may
-				be referenced in other Presentation messages, but itself does
-				not require a direct response. Presentation messages may be
-				cached, physically printed, implied, and so on.
-			</dd>
-			<dt>Presentation Response (duplex)</dt>
-			<dd>
-				The Holder's Response for a Presentation Request. This may
-				contain the Credential Presentation, or provide information on how to
-				get the Credential Presentation.
-			</dd>
-			<dt>Presentation Params (duplex) (optional)</dt>
-			<dd>
-				The Holder and Verifier MAY provide additional parameters relative
-				to the Presentation Response. Holders and Verifiers MAY exchange
-				this message as many times as required. 
-			</dd>
-		</dl>
-		<p class="note">
-			I am not sure this message belongs as part of this protocol - during the Response
-			these custom details may simply be negotiated for a particular Comm Channel.
-		</p>
-		<dl>
-			<dt>Get Presentation (duplex) (optional)</dt>
-			<dd>An optional step where the Verifier is required to call out to 
-				an external entity to collect the data. For example, an 
-				Encrypted Data Vault or an Identity Hub or a Web Service, etc...
-				The Comm Channel requirements for this step are negotiated 
-				during the Response. 
-			</dd>
-		</dl>
-	</section>
+            <dt>Introduce Message (duplex)</dt>
+            <dd>Holders Introduce themselves to Issuers by providing details about 
+                "who they are" and "how to communicate with them" - Identity and 
+                Location.
+            </dd>
+            <dt>Bootstrap Trust</dt>
+            <dd>Holders and Issuers go through a process of establishing a Trust
+                relationship. Examples include trusted TLS certificates in HTTPS
+                protocols, Verifiable Credential exchange, or physical (in person)
+                trust. 
+            </dd>
+            <dt>Create Credential (duplex)</dt>
+            <dd>The Holder is requesting a Credential of a certain type, schema, 
+                and format. The Issuer processes the request and returns the 
+                Credential if possible. This message may be implied by the Issuer
+                as Credential parameters may be determined out-of-band of this 
+                protocol (through user experience, for example).
+            </dd>
+            <dt>Credential Params (duplex)</dt>
+            <dd>This message may be sent if in order to create a credential an 
+                Issuer and Holder need exchange additional information. This message
+                MAY be sent in response to either Create Credential or Store 
+                Credential messages, and MAY be exchanged as many times as necessary. 
+            </dd>
+            <dt>Store Credential (duplex)</dt>
+            <dd>The Issuer is ready to provide a Verifiable Credential for use/storage
+                at the Holder. The Holder can accept the Credenital, or provide back 
+                a Credential Params response if neccessary (for example,
+                extra data to create the necessary cryptographic proofs).
+            </dd>
+        </dl>
+    </section>
+    <section id="hl-presentation">
+        <h2>Presentation Flow</h2>
+        <figure id="figure-protocol-hlf-present">
+            <img style="margin: auto; display: block; width: 100%;" src="diagrams/vc-protocol-hlf-present.png"
+            alt="Credential Presentaion High Level Message Flow.">
+            <figcaption style="text-align: center;">
+                Credential Presentation High Level Message Flow.
+            </figcaption>
+        </figure>
+        
+        <dl>
+            <dt>Presentation Request (simplex)</dt>
+            <dd>The Verifier makes a Presentation Request with the desired
+                parameters to the Holder. A Presentation Request message may
+                be referenced in other Presentation messages, but itself does
+                not require a direct response. Presentation messages may be
+                cached, physically printed, implied, and so on.
+            </dd>
+            <dt>Presentation Response (duplex)</dt>
+            <dd>
+                The Holder's Response for a Presentation Request. This may
+                contain the Credential Presentation, or provide information on how to
+                get the Credential Presentation.
+            </dd>
+            <dt>Presentation Params (duplex) (optional)</dt>
+            <dd>
+                The Holder and Verifier MAY provide additional parameters relative
+                to the Presentation Response. Holders and Verifiers MAY exchange
+                this message as many times as required. 
+            </dd>
+        </dl>
+        <p class="note">
+            I am not sure this message belongs as part of this protocol - during the Response
+            these custom details may simply be negotiated for a particular Comm Channel.
+        </p>
+        <dl>
+            <dt>Get Presentation (duplex) (optional)</dt>
+            <dd>An optional step where the Verifier is required to call out to 
+                an external entity to collect the data. For example, an 
+                Encrypted Data Vault or an Identity Hub or a Web Service, etc...
+                The Comm Channel requirements for this step are negotiated 
+                during the Response. 
+            </dd>
+        </dl>
+    </section>
 </section>
 
 <section id="use-cases">
 <h1>Use Cases</h1>
 <p>
-	The following are use cases this Protocol looks to enable. It should be noted 
-	reiterated that although there are already <a>Comm Channels</a> which may
-	enable some of these use cases, the goal of this Protocol is interoperabilty
-	across <a>Comm Channels</a>.
+    The following are use cases this Protocol looks to enable. It should be noted 
+    reiterated that although there are already <a>Comm Channels</a> which may
+    enable some of these use cases, the goal of this Protocol is interoperabilty
+    across <a>Comm Channels</a>.
 </p>
 <p>
-	<em>Scenario 1: Web Browser only</em>.  In browser Javascipt/plugin enables
-	Credential exchange.
+    <em>Scenario 1: Web Browser only</em>.  In browser Javascipt/plugin enables
+    Credential exchange.
 </p>
 <p>
-	<em>Scenario 2: Cloud Holder</em>. User has a web service as a Holder. 
+    <em>Scenario 2: Cloud Holder</em>. User has a web service as a Holder. 
 </p>
 <p>
-	<em>Scenario 3: OAuth Holder</em>. A Website integrated with OAuth can 
-	obtain data from a Verifiable Credentials Holder acting as an Authorization
-	Server and Resource Server.
+    <em>Scenario 3: OAuth Holder</em>. A Website integrated with OAuth can 
+    obtain data from a Verifiable Credentials Holder acting as an Authorization
+    Server and Resource Server.
 </p>
 <p>
-	<em>Scenario 4: Mobile Holder</em> A user with a Mobile App Holder
-	can share credentials with a cloud service. 
+    <em>Scenario 4: Mobile Holder</em> A user with a Mobile App Holder
+    can share credentials with a cloud service. 
 </p>
 <p>
-	<em>Scenario 5: Peer to Peer</em>. Two individuals with different Mobile
-	Apps can exchange credentials, even when they have no Internet connectivity. 
-	One of the Apps may be an automated Kiosk. 
+    <em>Scenario 5: Peer to Peer</em>. Two individuals with different Mobile
+    Apps can exchange credentials, even when they have no Internet connectivity. 
+    One of the Apps may be an automated Kiosk. 
 </p>
 <p>
-	<em>Scenario 6: Physical Presentation</em>. A user can scan a poster on the 
-	Subway to immediately donate money to a Charity. A user without a smartphone
-	can print out a Presentation and present it to a Kiosk for access.
+    <em>Scenario 6: Physical Presentation</em>. A user can scan a poster on the 
+    Subway to immediately donate money to a Charity. A user without a smartphone
+    can print out a Presentation and present it to a Kiosk for access.
 </p>
 
 </section>
 <section id="protocol-conventions">
 <h1>Conventions and Assumptions</h1>
 <p>
-	The following conventions are used in the design of this protocol:
+    The following conventions are used in the design of this protocol:
 </p>
 <ul>
-	<li>Pure JSON based messages. No special tags or semantics to support 
-		JSON-LD(@) or DIDComm(~). This protocol MUST be translatable to 
-		CBOR for low bandwith Comm Channels.
-	</li>
-	<li>
-		Message integrity and confidentiality (signing and encryption) is assumed to 
-		be a function of the <a>Comm Channel</a> and binding. If the <a>Comm Channel</a>
-		is not protecting messages in this way (or additonal cryptographic
-		integrity is required), the JOSE and COSE signing and encryption
-		payloads MUST be used.
-	</li>
-	<li>All messages are encapsulated in a "vc-ql" JSON object.</li>
+    <li>Pure JSON based messages. No special tags or semantics to support 
+        JSON-LD(@) or DIDComm(~). This protocol MUST be translatable to 
+        CBOR for low bandwith Comm Channels.
+    </li>
+    <li>
+        Message integrity and confidentiality (signing and encryption) is assumed to 
+        be a function of the <a>Comm Channel</a> and binding. If the <a>Comm Channel</a>
+        is not protecting messages in this way (or additonal cryptographic
+        integrity is required), the JOSE and COSE signing and encryption
+        payloads MUST be used.
+    </li>
+    <li>All messages are encapsulated in a "vc-ql" JSON object.</li>
 </ul>
 </section>
 <section id="issuer-spec">
-	<h1>Issuer Messages</h1>
+    <h1>Issuer Messages</h1>
 
-	<section id="issuer-spec-invite">
-		<h2>Invite</h2>
-		<p>
-		The purpose of the <code>invite</code> message is to publish basic 
-		trust credentials and service capabilities of the Issuer for the purposes
-		of discovery and connection bootstrapping by a Holder.
-		</p>
-		<p>
-			This message may be static and generaly available, or it may be 
-			generated in the context of a session, a transaction, or periodically.
-		</p>
-		<p class="note"> 
-			Need to determin what belongs here and what remains the the DID Document.
-		</p>
-		<dl>
-			<dt>type</dt>
-			<dd>
-				REQUIRED. MUST be set to "issuer-invite".
-			</dd>
-			<dt>iss</dt>
-			<dd>
-				<p>
-				REQUIRED. MUST be set to a URI for the issuer. This MAY be a 
-				URL or MAY be a DID. If the <code>iss</code> is a URL, it MUST
-				be "https://". DIDs MAY be <code>did:peer</code> DIDs or Resolvable DIDs.
-				</p>
-				<p class="issue">
-					How do did:key and did:web fit in here?
-				</p>
-			</dd>
-			<dt>enk</dt>
-			<dd>
-				OPTIONAL. MUST be a public key the Holder can use to encrypt
-				messages to the Issuer. This MAY be a JWK or a <code>did:key:...</code>
-			</dd>
-			<dt>proofs</dt>
-			<dd>
-				<p>
-				REQUIRED. An array of the supported formats of Verifiable Credential
-				proof algorithms the issuer is able to support. This MUST contain one of:
-				</p>
-				<ul>
-					<li><code>zkp</code>: for zero knowledge proofs.</li>
-					<li><code>ldsig</code>: for LD-Signature proofs.</li>
-					<li><code>jws</code>: for inline JWS proofs.</li>
-					<li><code>jwsd</code>: for detached JWS signature proofs. (is this a defined thing in v1.0?)</li>
-				</ul>
-			</dd>
-			<dt>bindings</dt>
-			<dd><p>
-				REQUIRED. An array of VC-QL binding schemes this issuer supports, and their associated connection
-				details.
-				</p>
-				<p class="issue"> 
-					Bindings may not make sense; this may be something that comes across in the DID Document.
-				</p>
-			</dd>
-			<dt>credentials</dt>
-			<dd><p>
-				REQUIRED. An array of credential types / schema definition DIDs. Schemas defined by URLs MUST used the 
-				<code>did:web:</code> method.
-				</p>
-				<p class="issue">
-					if we enforce did:web here, why not in the <code>iss</code> field?
-				</p> 
-			</dd>
-		</dl>
-	
+    <section id="issuer-spec-invite">
+        <h2>Invite</h2>
+        <p>
+        The purpose of the <code>invite</code> message is to publish basic 
+        trust credentials and service capabilities of the Issuer for the purposes
+        of discovery and connection bootstrapping by a Holder.
+        </p>
+        <p>
+            This message may be static and generaly available, or it may be 
+            generated in the context of a session, a transaction, or periodically.
+        </p>
+        <p class="note"> 
+            Need to determin what belongs here and what remains the the DID Document.
+        </p>
+        <dl>
+            <dt>type</dt>
+            <dd>
+                REQUIRED. MUST be set to "issuer-invite".
+            </dd>
+            <dt>iss</dt>
+            <dd>
+                <p>
+                REQUIRED. MUST be set to a URI for the issuer. This MAY be a 
+                URL or MAY be a DID. If the <code>iss</code> is a URL, it MUST
+                be "https://". DIDs MAY be <code>did:peer</code> DIDs or Resolvable DIDs.
+                </p>
+                <p class="issue">
+                    How do did:key and did:web fit in here?
+                </p>
+            </dd>
+            <dt>enk</dt>
+            <dd>
+                OPTIONAL. MUST be a public key the Holder can use to encrypt
+                messages to the Issuer. This MAY be a JWK or a <code>did:key:...</code>
+            </dd>
+            <dt>proofs</dt>
+            <dd>
+                <p>
+                REQUIRED. An array of the supported formats of Verifiable Credential
+                proof algorithms the issuer is able to support. This MUST contain one of:
+                </p>
+                <ul>
+                    <li><code>zkp</code>: for zero knowledge proofs.</li>
+                    <li><code>ldsig</code>: for LD-Signature proofs.</li>
+                    <li><code>jws</code>: for inline JWS proofs.</li>
+                    <li><code>jwsd</code>: for detached JWS signature proofs. (is this a defined thing in v1.0?)</li>
+                </ul>
+            </dd>
+            <dt>bindings</dt>
+            <dd><p>
+                REQUIRED. An array of VC-QL binding schemes this issuer supports, and their associated connection
+                details.
+                </p>
+                <p class="issue"> 
+                    Bindings may not make sense; this may be something that comes across in the DID Document.
+                </p>
+            </dd>
+            <dt>credentials</dt>
+            <dd><p>
+                REQUIRED. An array of credential types / schema definition DIDs. Schemas defined by URLs MUST used the 
+                <code>did:web:</code> method.
+                </p>
+                <p class="issue">
+                    if we enforce did:web here, why not in the <code>iss</code> field?
+                </p> 
+            </dd>
+        </dl>
+    
 
-		<pre class="example no-highlight" title="Sample Issuer Invitiation">
+        <pre class="example no-highlight" title="Sample Issuer Invitiation">
 "vc-ql": {
-	"type": "issuer-invite",
-	"iss" : "did:example:IiI",
-	"enk": "did:key:z6eu48rjfdi39djdiod9de9wjwid9d",
-	"proofs" : [ "zkp", "ldsig", "jws", "jwsd" ],
-	"bindings": [
-		{ "scheme": "https", "params" : { "endpoint: "https://issuer.org/request"} },
-		{ "scheme": "didcomm", "params" : { "@type" : "https://didcomm.org/didexchange/1.0/invitation", ...} },
-		{ "scheme": "oauth3", "params" : { "txnreq" : "https://issuer.org/oauth3/req"}},
-		{ "scheme": "js-inline"}
-	],
-	"credentials": [ "did:web:https://schema.org/Person" ]
+    "type": "issuer-invite",
+    "iss" : "did:example:IiI",
+    "enk": "did:key:z6eu48rjfdi39djdiod9de9wjwid9d",
+    "proofs" : [ "zkp", "ldsig", "jws", "jwsd" ],
+    "bindings": [
+        { "scheme": "https", "params" : { "endpoint: "https://issuer.org/request"} },
+        { "scheme": "didcomm", "params" : { "@type" : "https://didcomm.org/didexchange/1.0/invitation", ...} },
+        { "scheme": "oauth3", "params" : { "txnreq" : "https://issuer.org/oauth3/req"}},
+        { "scheme": "js-inline"}
+    ],
+    "credentials": [ "did:web:https://schema.org/Person" ]
 }
-		</pre>
-		<p>
-			Issuers MAY publish this <code>invite</code> for general public
-			access, or it MAY generate specific <code>invite</code>
-			messages for given scenarios, sessions, or use cases.
-		</p>
-		<p> 
-			How an issuer
-			provides this message to a Holder is out of scope for this specification,
-			but examples include hosting this information on a <code>.well-known/</code>
-			URL, printing a barcode Holders can scan, or providing it out of band to
-			Holder developers in a published API specification.
-		</p>
-		<p>
-			Holders that receive this message MUST process it in the following manner: 
-		</p>
-		<ol class="algorithm">
-			<li>
-				MUST check the <code>type</code> is "issuer-invite".
-			</li>
-			<li>
-				MUST verify the signature belongs to the <code>iss</code> by
-				either resolving the signing key from the DID document, or
-				verifying the host TLS certificate if the <code>iss</code> is a URL.
-			</li>
-			<li>MUST process the <code>enk</code> as an algorithm the Holder
-				can support and the key is valid.
-			</li>
-			<li>MUST process the <code>proofs</code> list to ensure the 
-				Holder can support at least one format. If the Holder is unable
-				to support at least one format, the Holder MUST inform the user
-				of the error and stop processing.
-			</li>
-			<li>
-				MUST process the <code>binding</code> array and find at least
-				one supported binding the Holder can support. If there is no 
-				compatible binding, the Holder MUST inform the user of the error
-				and stop processing.
-			</li>
-			<li>MUST process the <code>credentials</code> array and determin if those
-			    Credential types are applicable for the Holder.</li>
-		</ol>
-	</section>
-	<section id="issuer-spec-introduce">
-		<h2>Introduce</h2>
-		<p>
-			Introduction is a request/response protocol message. Holders introduce
-			their subjects (and possibly themselves) to the Issuer, and the Issuer 
-			MUST indicate if the introduction was accepted, rejected, or needs 
-			more information.
-		</p>
-		<section id="issuer-spec-intro-req">
-			<h3>Introduction Request</h3>
-			<p>
-				Holders send a <code>issuer-introduce</code> message to provide
-				a subject identifier and associated key material for the issuer
-				to establish trust in the Holder.
-			</p>
-			<p>
-				This message MUST be a JWS. The associated "kid" MUST be a subject owned 
-				signing key related to the subject identifier provided in the message.
-			</p>
-			<dl>
-				<dt>type</dt>
-				<dd>REQUIRED. MUST be set to "issuer-introduce".</dd>
-				<dt>sub</dt>
-				<dd><p>
-					REQUIRED. The subject's Identifier for the Issuer and to be contained 
-					in the Verifiable Credentials as the <code>credentialSubject</code>.
-					</p>
-					<p class="issue">
-						Why am I using diffent terms then the Verifiable Credntials spec? 
-						The answer is 'brevity for low bandwidth Comm Channels' but is that valid?
-					</p>
-				</dd>
-				<dt>aud</dt>
-				<dd>REQUIRED. The issuer identifier URI.</dd>
-				<dt>enk</dt>
-				<dd>OPTIONAL. The encryption key to use when sending encrypted payloads,
-					if the Comm Channel is not fully trusted.
-					This MUST be assocaited to the <code>sub</code> URI - for example, 
-					a key defined in the DID Document.
-				</dd>
-				<dt>params</dt>
-				<dd><p>
-					OPTIONAL. The Holder MAY provide additional parameters in this
-					introduction if the Holder knows a-priori that they will be required.
-					If this message is in response to a previous <code>issue-introduce-continue</code> result,
-					this object holds the required parameters to complete the introduction
-					(or continue negotation).
-					</p>
-					<p>
-					For example, attestations as to the type of software acting as a 
-					Holder, the contents of a <code>did:peer</code> document, etc... <em>TBD</em>
-					</p>
-				</dd>
-			</dl>
+        </pre>
+        <p>
+            Issuers MAY publish this <code>invite</code> for general public
+            access, or it MAY generate specific <code>invite</code>
+            messages for given scenarios, sessions, or use cases.
+        </p>
+        <p> 
+            How an issuer
+            provides this message to a Holder is out of scope for this specification,
+            but examples include hosting this information on a <code>.well-known/</code>
+            URL, printing a barcode Holders can scan, or providing it out of band to
+            Holder developers in a published API specification.
+        </p>
+        <p>
+            Holders that receive this message MUST process it in the following manner: 
+        </p>
+        <ol class="algorithm">
+            <li>
+                MUST check the <code>type</code> is "issuer-invite".
+            </li>
+            <li>
+                MUST verify the signature belongs to the <code>iss</code> by
+                either resolving the signing key from the DID document, or
+                verifying the host TLS certificate if the <code>iss</code> is a URL.
+            </li>
+            <li>MUST process the <code>enk</code> as an algorithm the Holder
+                can support and the key is valid.
+            </li>
+            <li>MUST process the <code>proofs</code> list to ensure the 
+                Holder can support at least one format. If the Holder is unable
+                to support at least one format, the Holder MUST inform the user
+                of the error and stop processing.
+            </li>
+            <li>
+                MUST process the <code>binding</code> array and find at least
+                one supported binding the Holder can support. If there is no 
+                compatible binding, the Holder MUST inform the user of the error
+                and stop processing.
+            </li>
+            <li>MUST process the <code>credentials</code> array and determin if those
+                Credential types are applicable for the Holder.</li>
+        </ol>
+    </section>
+    <section id="issuer-spec-introduce">
+        <h2>Introduce</h2>
+        <p>
+            Introduction is a request/response protocol message. Holders introduce
+            their subjects (and possibly themselves) to the Issuer, and the Issuer 
+            MUST indicate if the introduction was accepted, rejected, or needs 
+            more information.
+        </p>
+        <section id="issuer-spec-intro-req">
+            <h3>Introduction Request</h3>
+            <p>
+                Holders send a <code>issuer-introduce</code> message to provide
+                a subject identifier and associated key material for the issuer
+                to establish trust in the Holder.
+            </p>
+            <p>
+                This message MUST be a JWS. The associated "kid" MUST be a subject owned 
+                signing key related to the subject identifier provided in the message.
+            </p>
+            <dl>
+                <dt>type</dt>
+                <dd>REQUIRED. MUST be set to "issuer-introduce".</dd>
+                <dt>sub</dt>
+                <dd><p>
+                    REQUIRED. The subject's Identifier for the Issuer and to be contained 
+                    in the Verifiable Credentials as the <code>credentialSubject</code>.
+                    </p>
+                    <p class="issue">
+                        Why am I using diffent terms then the Verifiable Credntials spec? 
+                        The answer is 'brevity for low bandwidth Comm Channels' but is that valid?
+                    </p>
+                </dd>
+                <dt>aud</dt>
+                <dd>REQUIRED. The issuer identifier URI.</dd>
+                <dt>enk</dt>
+                <dd>OPTIONAL. The encryption key to use when sending encrypted payloads,
+                    if the Comm Channel is not fully trusted.
+                    This MUST be assocaited to the <code>sub</code> URI - for example, 
+                    a key defined in the DID Document.
+                </dd>
+                <dt>params</dt>
+                <dd><p>
+                    OPTIONAL. The Holder MAY provide additional parameters in this
+                    introduction if the Holder knows a-priori that they will be required.
+                    If this message is in response to a previous <code>issue-introduce-continue</code> result,
+                    this object holds the required parameters to complete the introduction
+                    (or continue negotation).
+                    </p>
+                    <p>
+                    For example, attestations as to the type of software acting as a 
+                    Holder, the contents of a <code>did:peer</code> document, etc... <em>TBD</em>
+                    </p>
+                </dd>
+            </dl>
 
-			<pre class="example no-highlight" title="Isser Introduce message example">
+            <pre class="example no-highlight" title="Isser Introduce message example">
 "vc-ql" : {
-	"type" : "issuer-introduce",
-	"sub" : "did:example:Udid99",
-	"aud" : "did:example:IiI",
-	"enk" : "did:example:Udid99#key-2",
-	"params" : { }
+    "type" : "issuer-introduce",
+    "sub" : "did:example:Udid99",
+    "aud" : "did:example:IiI",
+    "enk" : "did:example:Udid99#key-2",
+    "params" : { }
 }
-			</pre>
-			<p class="issue">Should this be "id" instead of "sub" ? </p>
-			<p class="issue">Should this be a JWE, or a JWS with the option of JWE if required?</p>
-			<p class="issue">How does this work with the concept of <code>handles</code> in OAuth "3" ?</p>
-			<p>When processing this <code>introduce</code> message the Issuer:</p>
-			<ol class="algorithm">
-				<li>MUST check the message type is <code>issuer-introduce</code>.</li>
-				<li>MUST ensure it is the owner of the <code>aud</code> URI.</li>
-				<li>MUST ensure the JWS/E header is using a <code>kid</code> associated to the <code>sub</code> URI.
-					For example, by dereferencing a DID and locating the key in the DID Document.
-				</li>
-				<li>MUST ignore the <code>params</code> field if no additonal parameters are expected.</li>
-				<li>If processing the <code>params</code> field, only process expected fields and MUST ignore others it does not recognize.</li>
-			</ol>
-		</section>
-		<section id="issuer-spec-intro-res">
-			<h3>Introduction Response</h3>
-			<p>
-				Issuers make a decision to proceed with the Holder based in the
-				contents and quality of the <code>issuer-introduce</code> request.
-			</p>
-			<p>
-				Issuers who are ready to proceed send back an <code>accepted</code>
-				response. Issuers that need more information send back a 
-				<code>continue</code> response. Issuers that cannot proceed send
-				back a <code>rejected</code> response. 
-			</p>
-			<p class="note">Currently I am leaving the synchronous/asynchronous message mapping to the Comm Channel, for example the DIDComm "~thread" field.</p>
-			
-			<p><code>accetped</code></p>
+            </pre>
+            <p class="issue">Should this be "id" instead of "sub" ? </p>
+            <p class="issue">Should this be a JWE, or a JWS with the option of JWE if required?</p>
+            <p class="issue">How does this work with the concept of <code>handles</code> in OAuth "3" ?</p>
+            <p>When processing this <code>introduce</code> message the Issuer:</p>
+            <ol class="algorithm">
+                <li>MUST check the message type is <code>issuer-introduce</code>.</li>
+                <li>MUST ensure it is the owner of the <code>aud</code> URI.</li>
+                <li>MUST ensure the JWS/E header is using a <code>kid</code> associated to the <code>sub</code> URI.
+                    For example, by dereferencing a DID and locating the key in the DID Document.
+                </li>
+                <li>MUST ignore the <code>params</code> field if no additonal parameters are expected.</li>
+                <li>If processing the <code>params</code> field, only process expected fields and MUST ignore others it does not recognize.</li>
+            </ol>
+        </section>
+        <section id="issuer-spec-intro-res">
+            <h3>Introduction Response</h3>
+            <p>
+                Issuers make a decision to proceed with the Holder based in the
+                contents and quality of the <code>issuer-introduce</code> request.
+            </p>
+            <p>
+                Issuers who are ready to proceed send back an <code>accepted</code>
+                response. Issuers that need more information send back a 
+                <code>continue</code> response. Issuers that cannot proceed send
+                back a <code>rejected</code> response. 
+            </p>
+            <p class="note">Currently I am leaving the synchronous/asynchronous message mapping to the Comm Channel, for example the DIDComm "~thread" field.</p>
+            
+            <p><code>accetped</code></p>
 
-			<pre class="example no-highlight" title="intro accepted response">
+            <pre class="example no-highlight" title="intro accepted response">
 "vc-ql": {
-	"type" : "issuer-introduce-accepted"
+    "type" : "issuer-introduce-accepted"
 }
-			</pre>
-			<p>
-				When a Holder receives an <code>accepted</code> response, they
-				MUST use the same <code>sub</code> identifier for the rest of 
-				this Issuance session.  
-			</p>
+            </pre>
+            <p>
+                When a Holder receives an <code>accepted</code> response, they
+                MUST use the same <code>sub</code> identifier for the rest of 
+                this Issuance session.  
+            </p>
 
-			<p>continue</p>
-			<pre class="example no-highlight" title="intro continue response">
+            <p>continue</p>
+            <pre class="example no-highlight" title="intro continue response">
 "vc-ql": {
-	"type" : "issuer-introduce-continue",
-	"params" : { }
+    "type" : "issuer-introduce-continue",
+    "params" : { }
 }
-			</pre>
-			<p>
-				When a Holder receives a <code>continue</code> response,
-				the Issuer is asking for more information to bootstrap
-				the trust in the Holder (not necessarily the Subject! 
-				Although in some use cases verifying the Subject may be 
-				efficient). The <code>params</code> will contain the Issuer
-				requirements. <em>TBD</em>.
-			</p>
-			<p>
-				Holders that are able to continue MUST re-issue a <code>issuer-introduce</code>
-				message with the continue parameters in the <code>params</code> section 
-				of the message. The Holder MUST use the same <code>sub</code> URI in the
-				subsequent message.
-			</p>
-			<p class="issue">
-				Does this protocl need the concept of DIDComm threading? Ideally Comm channels
-				can handle that... 
-			</p>
-		</section>
-	</section>
-	<section id="issue-bootstrap-trust">
-		<h2>Bootstrapping Trust</h2>
-		<p>
-			Bootstrapping trust refers to the exchange of messages required 
-			for the Issuer and Subject/Holder to establish the required trust
-			assurance to Issue (and accept) the Credential. A trivial example
-			would be in the case of a driver's license:
-		</p>
-		<ul>
-			<li>
-				How does the Subject and Holder trust they are getting a 
-				Credential from their DMV?
-			</li>
-			<li>
-				How does the DMV Issuer know it is issuing the credential to the
-				right Driver, and to a trusted Holder software product?  
-			</li>
-		</ul>
-		<p>
-			<em>Trust Frameworks</em> and their governance are outside the scope
-			of this specification. For the purposes of this specification it is
-			sufficient to note that profiles of this protocol MUST define the 
-			requirements of how trust is established between Issuer, Holder and
-			Subject before Issuance can occur.
-		</p>
-		<p>
-			Examples include the use of TLS certificates, providing Verifiable
-			Credenitals issued from a shared Trust authority, providing 
-			attestation certificates such as in [[Web AuthN]], the exchange of
-			shared secrets or other credentials, or even in-person, physical trust
-			establishment (like a certification sticker on a barcode reader).
-		</p>
-	</section>
-	<section id="issue-create-cred">
-		<h2>Create Credenital</h2>
-		<p>
-			This is a message for a Holder to request a credential of a certain
-			type from an Issuer. This message is OPTIONAL in a workflow. 
-		</p>
-		<p>
-			In workflows where a Holder is actively trying to collect credentials
-			from Issuers and the Comm Channel allows for the Holder to reach
-			out to the Issuer, this message MAY be used. This message MAY be used
-			in scenarios where additonal Holder to Issuer messages are required
-			to generate the Credential, for example in Zero Knowledge Proof 
-			scenarios.
-		</p>
-		<p>
-			In workflows where the Issuer is interacting with the user and then
-			offers to provide a Credenital to the user's Holder, for example
-			at a physical kiosk or a website, the Issuer may interact with the user
-			to determin the parameters of the Credenital it is willing to issue,
-			then skip right to the Store Credential message.
-		</p>
-		<section id="issue-create-cred-req">
-			<h3>Create Credential Request</h3>
-			<p>
-				Holders send a <code>issue-credential-request</code> to
-				collect a Credential from an Issuer. Holders MAY request multiple
-				Credenitals in a single message. 
-			</p>
-			<p>
-				Messages SHOULD be trusted and secured over the <a>Comm Channel</a>. If the 
-				<a>Comm Channel</a> cannot provide the acceptable level of trust and
-				security, this message MUST be sent as a JOSE signed and/or encrypted
-				payloads, or COSE (RFC 8152) signed and/or encrypted payload.
-			</p>
-			<p>
-				Holders MUST prove they are a controller of the Subject Identifiers
-				contained in each request. This can be established through the 
-				<a>Comm Channel</a>, through the above JOSE/COSE payload wrappers, or
-				through a commonly understood application level control (such as proof
-				of a "link secret" that the Issuer understands).
-			</p>
-			<p class="issue"> How can a processing agent can easily detect if the payload is plain, jose, or cose? Do we need an object name ( "cose" : ...) or just detect string v. object... ?</p>
+            </pre>
+            <p>
+                When a Holder receives a <code>continue</code> response,
+                the Issuer is asking for more information to bootstrap
+                the trust in the Holder (not necessarily the Subject! 
+                Although in some use cases verifying the Subject may be 
+                efficient). The <code>params</code> will contain the Issuer
+                requirements. <em>TBD</em>.
+            </p>
+            <p>
+                Holders that are able to continue MUST re-issue a <code>issuer-introduce</code>
+                message with the continue parameters in the <code>params</code> section 
+                of the message. The Holder MUST use the same <code>sub</code> URI in the
+                subsequent message.
+            </p>
+            <p class="issue">
+                Does this protocl need the concept of DIDComm threading? Ideally Comm channels
+                can handle that... 
+            </p>
+        </section>
+    </section>
+    <section id="issue-bootstrap-trust">
+        <h2>Bootstrapping Trust</h2>
+        <p>
+            Bootstrapping trust refers to the exchange of messages required 
+            for the Issuer and Subject/Holder to establish the required trust
+            assurance to Issue (and accept) the Credential. A trivial example
+            would be in the case of a driver's license:
+        </p>
+        <ul>
+            <li>
+                How does the Subject and Holder trust they are getting a 
+                Credential from their DMV?
+            </li>
+            <li>
+                How does the DMV Issuer know it is issuing the credential to the
+                right Driver, and to a trusted Holder software product?  
+            </li>
+        </ul>
+        <p>
+            <em>Trust Frameworks</em> and their governance are outside the scope
+            of this specification. For the purposes of this specification it is
+            sufficient to note that profiles of this protocol MUST define the 
+            requirements of how trust is established between Issuer, Holder and
+            Subject before Issuance can occur.
+        </p>
+        <p>
+            Examples include the use of TLS certificates, providing Verifiable
+            Credenitals issued from a shared Trust authority, providing 
+            attestation certificates such as in [[Web AuthN]], the exchange of
+            shared secrets or other credentials, or even in-person, physical trust
+            establishment (like a certification sticker on a barcode reader).
+        </p>
+    </section>
+    <section id="issue-create-cred">
+        <h2>Create Credenital</h2>
+        <p>
+            This is a message for a Holder to request a credential of a certain
+            type from an Issuer. This message is OPTIONAL in a workflow. 
+        </p>
+        <p>
+            In workflows where a Holder is actively trying to collect credentials
+            from Issuers and the Comm Channel allows for the Holder to reach
+            out to the Issuer, this message MAY be used. This message MAY be used
+            in scenarios where additonal Holder to Issuer messages are required
+            to generate the Credential, for example in Zero Knowledge Proof 
+            scenarios.
+        </p>
+        <p>
+            In workflows where the Issuer is interacting with the user and then
+            offers to provide a Credenital to the user's Holder, for example
+            at a physical kiosk or a website, the Issuer may interact with the user
+            to determin the parameters of the Credenital it is willing to issue,
+            then skip right to the Store Credential message.
+        </p>
+        <section id="issue-create-cred-req">
+            <h3>Create Credential Request</h3>
+            <p>
+                Holders send a <code>issue-credential-request</code> to
+                collect a Credential from an Issuer. Holders MAY request multiple
+                Credenitals in a single message. 
+            </p>
+            <p>
+                Messages SHOULD be trusted and secured over the <a>Comm Channel</a>. If the 
+                <a>Comm Channel</a> cannot provide the acceptable level of trust and
+                security, this message MUST be sent as a JOSE signed and/or encrypted
+                payloads, or COSE (RFC 8152) signed and/or encrypted payload.
+            </p>
+            <p>
+                Holders MUST prove they are a controller of the Subject Identifiers
+                contained in each request. This can be established through the 
+                <a>Comm Channel</a>, through the above JOSE/COSE payload wrappers, or
+                through a commonly understood application level control (such as proof
+                of a "link secret" that the Issuer understands).
+            </p>
+            <p class="issue"> How can a processing agent can easily detect if the payload is plain, jose, or cose? Do we need an object name ( "cose" : ...) or just detect string v. object... ?</p>
 
-			<p class="note">
-				Is the Link Secret in Indy a Comm Channel property? That would be nice
-				because then it can be removed from here as it may be confusing to implementors.
-			</p>
-			<dl>
-				<dt>type</dt>
-				<dd>REQUIRED. MUST be set to <code>issue-credential-request</code>.</dd>
-				<p class="issue">Does <code>type</code> make sense w/o <code>@context</code>?</p>
-			
-				<dt>sub</dt>
-				<dd>
-					REQUIRED. MUST be the Subject of the Credential, represented by the Holder.
-					This MUST be an identifier already known to the Issuer through a
-					<code>issuer-introduce</code> message, or derivable from an introduction. 
-				</dd>
-			
-				<dt>aud</dt>
-				<dd>
-					REQUIRED. MUST be the URI of the Issuer "trusted" of during the
-					<a href="#issue-bootstrap-trust"></a> stage. Issuers may have
-					multiple identifiers, so this ensures the correct Issuer ID is 
-					used in the Verifiable Credential. 
-				</dd>
-				<p class="Issue">Hmm, like Subject, do we need to have multiplicity here?</p>
-				
-				<dt>credentials</dt>
-				<dd>
-					<p>REQUIRED. A non-empty array of credential types the Holder is requesting.</p>
-					<dl>
-						<dt>type</dt>
-						<dd>REQUIRED. A non-empty array of Credential type definitions that will match the Verifiable Credential <code>type</code> field.</dd>
-						<dt>id</dt>
-						<dd>REQUIRED. The Holder ID requesting this Credential be issued to. MUST be linked to the <code>sub</code>.</dd>
-						<dt>claims</dt>
-						<dd>OPTIONAL. An array of <a>property</a> strings in the schema for the desired (subset) of claims to be included. If <em>null</em> then all claims in the schema are assumed to be requested.</dd>
-						<dt>params</dt>
-						<dd>OPTIONAL. Any additional parameters or custom extentions required to issue the credential. This SHOULD contains the result to any previous <code>issue-credential-params</code> response message.</dd>
-		
-					</dl>
-				</dd>
-			</dl>
-		</dl>
-			<pre class="example no-highlight" title="intro accepted response">
+            <p class="note">
+                Is the Link Secret in Indy a Comm Channel property? That would be nice
+                because then it can be removed from here as it may be confusing to implementors.
+            </p>
+            <dl>
+                <dt>type</dt>
+                <dd>REQUIRED. MUST be set to <code>issue-credential-request</code>.</dd>
+                <p class="issue">Does <code>type</code> make sense w/o <code>@context</code>?</p>
+            
+                <dt>sub</dt>
+                <dd>
+                    REQUIRED. MUST be the Subject of the Credential, represented by the Holder.
+                    This MUST be an identifier already known to the Issuer through a
+                    <code>issuer-introduce</code> message, or derivable from an introduction. 
+                </dd>
+            
+                <dt>aud</dt>
+                <dd>
+                    REQUIRED. MUST be the URI of the Issuer "trusted" of during the
+                    <a href="#issue-bootstrap-trust"></a> stage. Issuers may have
+                    multiple identifiers, so this ensures the correct Issuer ID is 
+                    used in the Verifiable Credential. 
+                </dd>
+                <p class="Issue">Hmm, like Subject, do we need to have multiplicity here?</p>
+                
+                <dt>credentials</dt>
+                <dd>
+                    <p>REQUIRED. A non-empty array of credential types the Holder is requesting.</p>
+                    <dl>
+                        <dt>type</dt>
+                        <dd>REQUIRED. A non-empty array of Credential type definitions that will match the Verifiable Credential <code>type</code> field.</dd>
+                        <dt>id</dt>
+                        <dd>REQUIRED. The Holder ID requesting this Credential be issued to. MUST be linked to the <code>sub</code>.</dd>
+                        <dt>claims</dt>
+                        <dd>OPTIONAL. An array of <a>property</a> strings in the schema for the desired (subset) of claims to be included. If <em>null</em> then all claims in the schema are assumed to be requested.</dd>
+                        <dt>params</dt>
+                        <dd>OPTIONAL. Any additional parameters or custom extentions required to issue the credential. This SHOULD contains the result to any previous <code>issue-credential-params</code> response message.</dd>
+        
+                    </dl>
+                </dd>
+            </dl>
+        </dl>
+            <pre class="example no-highlight" title="intro accepted response">
 "vc-ql": {
-	"type" : "issue-credential-request",
-	"sub" : "did:example:Udid99",
-	"aud" : "did:example:IiI",
-	"proof" : "ld-proof",
-	"credentials" : [ 
-		{ 
-			"type" : [ "VerifiableCredential", "UniversityDegreeCredential" ],
-			"id" : "did:example:Udid99",
-			"params" : { } 
-		},
-		{
-			"type" : [ "VerifiableCredential", "UniversityTranscriptCredential" ],
-			"id" : "did:example:Udid99",
-			"claims" : [ "final_gpa" ]
-			"params" : { }
-		}
-	 ]
+    "type" : "issue-credential-request",
+    "sub" : "did:example:Udid99",
+    "aud" : "did:example:IiI",
+    "proof" : "ld-proof",
+    "credentials" : [ 
+        { 
+            "type" : [ "VerifiableCredential", "UniversityDegreeCredential" ],
+            "id" : "did:example:Udid99",
+            "params" : { } 
+        },
+        {
+            "type" : [ "VerifiableCredential", "UniversityTranscriptCredential" ],
+            "id" : "did:example:Udid99",
+            "claims" : [ "final_gpa" ]
+            "params" : { }
+        }
+     ]
 }
-			</pre>
-			<p class="issue">
-				should "sub" be "id" ?
-			</p>
-			<p class="issue">
-				should "VerifiableCredentrial" type be implied ? its in the protocol name, after all ...
-			</p>
-			<p class="issue">
-				credentials may have different DIDs for privacy and unlink-ability... how does an Issuer link the DIDs "together" ?
-				Do we need multiplicity in the <code>isser-introduce</code> message?
-			</p>
-			<p>
-				Issuers process the <code>issue-credential-request</code> message as follows:
-			</p>
-			<ol>
-				<li><code>type</code> MUST be <code>issue-credential-request</code>.</li>
-				<li><code>sub</code> MUST be known to the Issuer through an <code>issuer-introduce</code> message.</li>
-				<li><code>aud</code> Issuer MUST be a controller of the identifier URI.</li>
-				<li><code>credentials</code> MUST not be empty.</li>
-				<li><code>credentials.type</code> MUST contain <code>VerifiableCredential</code></li>
-				<li><code>credential.type</code> MUST contain only Credential schemas supported by the Issuer.</li>
-				<li><code>credential.id</code> MUST be a URI <em>controlled</em> by the Holder and linked to the <code>sub</code>.</li>
-				<li>The Issuer MUST only include <code>credential.claims</code> assocaited to the schema, and no more. Schema specific properly matching (i.e. beyond the property name) is outside the scope of this specificiation.</li>
-				<li>The Issuer MUST ignore any <code>credential.params</code> it does not recognize.</li>
-			</ol>
-			<p>
-				Issuers MUST determin if there is enough "trust" in the Holder 
-				(either through this session or a previous session) to issue the requested
-				credentials. 
-			</p>
-			<p>
-				Issuer MUST determin if they have enough information from the Subject or Holder
-				to issue the credential, or if additonal data is required. If the Issuer is 
-				ready to issue the credential, it MAY respond with a <code>issue-credential-store</code>
-				response. If the Issuer requires
-				more information, it MAY return a <code>issue-credential-params</code> response
-				or an <code>issue-credential-error</code> response and collect more information
-				out-of-band from this protocol.
-			</p>
-			<p>
-				Issuers MUST determin if their own internal policies, and those of their 
-				trust framework, are met for Credential issuance.
-			</p>
-		</section>
-		<section id="issue-create-cred-res">
-			<h3>Issue Credential Parameters</h3>
-			<p>
-				This message is used by both Holders and Issuers to specify additional
-				parameters either required or available to issue the credential.
-			</p>
-			<p>
-				Parameters may include cryptographic materials, additional Credentials 
-				or trust bootstrapping, user interaction or user agent parameters.
-			</p>
-			<p class="note">
-				Normative <code>params</code> are outside the scope of this
-				specification, but should they be? Do we need to define at least a
-				couple "useful" ones?
-			</p>
-			<pre class="example no-highlight" title="intro accepted response">
+            </pre>
+            <p class="issue">
+                should "sub" be "id" ?
+            </p>
+            <p class="issue">
+                should "VerifiableCredentrial" type be implied ? its in the protocol name, after all ...
+            </p>
+            <p class="issue">
+                credentials may have different DIDs for privacy and unlink-ability... how does an Issuer link the DIDs "together" ?
+                Do we need multiplicity in the <code>isser-introduce</code> message?
+            </p>
+            <p>
+                Issuers process the <code>issue-credential-request</code> message as follows:
+            </p>
+            <ol>
+                <li><code>type</code> MUST be <code>issue-credential-request</code>.</li>
+                <li><code>sub</code> MUST be known to the Issuer through an <code>issuer-introduce</code> message.</li>
+                <li><code>aud</code> Issuer MUST be a controller of the identifier URI.</li>
+                <li><code>credentials</code> MUST not be empty.</li>
+                <li><code>credentials.type</code> MUST contain <code>VerifiableCredential</code></li>
+                <li><code>credential.type</code> MUST contain only Credential schemas supported by the Issuer.</li>
+                <li><code>credential.id</code> MUST be a URI <em>controlled</em> by the Holder and linked to the <code>sub</code>.</li>
+                <li>The Issuer MUST only include <code>credential.claims</code> assocaited to the schema, and no more. Schema specific properly matching (i.e. beyond the property name) is outside the scope of this specificiation.</li>
+                <li>The Issuer MUST ignore any <code>credential.params</code> it does not recognize.</li>
+            </ol>
+            <p>
+                Issuers MUST determin if there is enough "trust" in the Holder 
+                (either through this session or a previous session) to issue the requested
+                credentials. 
+            </p>
+            <p>
+                Issuer MUST determin if they have enough information from the Subject or Holder
+                to issue the credential, or if additonal data is required. If the Issuer is 
+                ready to issue the credential, it MAY respond with a <code>issue-credential-store</code>
+                response. If the Issuer requires
+                more information, it MAY return a <code>issue-credential-params</code> response
+                or an <code>issue-credential-error</code> response and collect more information
+                out-of-band from this protocol.
+            </p>
+            <p>
+                Issuers MUST determin if their own internal policies, and those of their 
+                trust framework, are met for Credential issuance.
+            </p>
+        </section>
+        <section id="issue-create-cred-res">
+            <h3>Issue Credential Parameters</h3>
+            <p>
+                This message is used by both Holders and Issuers to specify additional
+                parameters either required or available to issue the credential.
+            </p>
+            <p>
+                Parameters may include cryptographic materials, additional Credentials 
+                or trust bootstrapping, user interaction or user agent parameters.
+            </p>
+            <p class="note">
+                Normative <code>params</code> are outside the scope of this
+                specification, but should they be? Do we need to define at least a
+                couple "useful" ones?
+            </p>
+            <pre class="example no-highlight" title="intro accepted response">
 "vc-ql": {
-	"type" : "issue-credentials-params",
-	"aud" : "did:example:Udid99",
-	"iss" : "did:example:IiI",
-	"credentials" : [ 
-		{ 
-			"type" : [ "VerifiableCredential", "UniversityDegree" ],
-			"id" : "did:example:Udid99",
-			"params" : { 
-				"myparam1" : { "type: : "present-credential-request", ... }
-			} 
-		},
-		{
-			"type" : [ "VerifiableCredential", "UniversityTranscript" ],
-			"id" : "did:example:Udid99",
-			"params" : { 
-				"redirect" : { "type" : "url_interaction", ... } 
-			}
-		}
-	 ]
+    "type" : "issue-credentials-params",
+    "aud" : "did:example:Udid99",
+    "iss" : "did:example:IiI",
+    "credentials" : [ 
+        { 
+            "type" : [ "VerifiableCredential", "UniversityDegree" ],
+            "id" : "did:example:Udid99",
+            "params" : { 
+                "myparam1" : { "type: : "present-credential-request", ... }
+            } 
+        },
+        {
+            "type" : [ "VerifiableCredential", "UniversityTranscript" ],
+            "id" : "did:example:Udid99",
+            "params" : { 
+                "redirect" : { "type" : "url_interaction", ... } 
+            }
+        }
+     ]
 }
-			</pre>
-			<p>
-				The params response is another issue-credential-request with the
-				param results provided in the same field/key. For example, 
-				"myparam1" would contain the Verifiable Presentation - 
-				"redirect" would contain the result from the URL redirect, and
-				so on.
-			</p>
-		</section>
-	</section>
-	<section id="issue-store-cred">
-		<h2>Store Credential</h2>
-		<p>
-			This message is from the Issuer to the Holder containing
-			the issued <a>Verifiable Credential</a>.
-		</p>
-		<p> 
-			This message SHOULD be trusted and secured over the <a>Comm Channel</a>.
-			If the <a>Comm Channel</a> cannot provide enough trust or security, this
-			message MUST be wrapped in JOSE or COSE signing and/or encryption payloads.
-			This message MUST be encrypted directly to the Holder or the Holder's EDV.
-		</p>
-		<p class="issue"> Same issue as above on how a processing agent can easily detect if the payload is plain, jose, or cose?</p>
-		<pre class="example ho-highlight">
+            </pre>
+            <p>
+                The params response is another issue-credential-request with the
+                param results provided in the same field/key. For example, 
+                "myparam1" would contain the Verifiable Presentation - 
+                "redirect" would contain the result from the URL redirect, and
+                so on.
+            </p>
+        </section>
+    </section>
+    <section id="issue-store-cred">
+        <h2>Store Credential</h2>
+        <p>
+            This message is from the Issuer to the Holder containing
+            the issued <a>Verifiable Credential</a>.
+        </p>
+        <p> 
+            This message SHOULD be trusted and secured over the <a>Comm Channel</a>.
+            If the <a>Comm Channel</a> cannot provide enough trust or security, this
+            message MUST be wrapped in JOSE or COSE signing and/or encryption payloads.
+            This message MUST be encrypted directly to the Holder or the Holder's EDV.
+        </p>
+        <p class="issue"> Same issue as above on how a processing agent can easily detect if the payload is plain, jose, or cose?</p>
+        <pre class="example ho-highlight">
 vc-ql : {
-	"type" : "issuer-store-credential"
-	"vcs" : [ 
-		{ 
-			"@context": [
-			  "https://www.w3.org/2018/credentials/v1",
-			  "https://www.w3.org/2018/credentials/examples/v1"
-			],
-			"id": "UniqueIdentifierGoesHere",
-			"type": [ "VerifiableCredential", "UniversityDegreeCredential"],
-			"issuer": "did:example:IiI",
-			"issuanceDate": "2010-01-01T19:73:24Z",
-			"credentialSubject": {
-			  "id": "did:example:Udid99",
-			  "degree": {
-				"type": "BachelorDegree",
-				"name": "Bachelor of Science and Arts"
-			},
-			"proof": {
-			  "type": "RsaSignature2018",
-			  "created": "2017-06-18T21:19:10Z",
-			  "proofPurpose": "assertionMethod",
-			  "verificationMethod": "did:example:IiI#key-1",
-			  "jws": "eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..TCYt5X
-				sITJX1CxPCT8yAV-TVkIEq_PbChOMqsLfRoPsnsgw5WEuts01mq-pQy7UJiN5mgRxD-WUc
-				X16dUEMGlv50aqzpqh4Qktb3rk-BuQy72IFLOqV0G_zS245-kronKb78cPN25DGlcTwLtj
-				PAYuNzVBAh4vGHSrQyHUdBBPM"
-			}
-		}
-	]
+    "type" : "issuer-store-credential"
+    "vcs" : [ 
+        { 
+            "@context": [
+              "https://www.w3.org/2018/credentials/v1",
+              "https://www.w3.org/2018/credentials/examples/v1"
+            ],
+            "id": "UniqueIdentifierGoesHere",
+            "type": [ "VerifiableCredential", "UniversityDegreeCredential"],
+            "issuer": "did:example:IiI",
+            "issuanceDate": "2010-01-01T19:73:24Z",
+            "credentialSubject": {
+              "id": "did:example:Udid99",
+              "degree": {
+                "type": "BachelorDegree",
+                "name": "Bachelor of Science and Arts"
+            },
+            "proof": {
+              "type": "RsaSignature2018",
+              "created": "2017-06-18T21:19:10Z",
+              "proofPurpose": "assertionMethod",
+              "verificationMethod": "did:example:IiI#key-1",
+              "jws": "eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..TCYt5X
+                sITJX1CxPCT8yAV-TVkIEq_PbChOMqsLfRoPsnsgw5WEuts01mq-pQy7UJiN5mgRxD-WUc
+                X16dUEMGlv50aqzpqh4Qktb3rk-BuQy72IFLOqV0G_zS245-kronKb78cPN25DGlcTwLtj
+                PAYuNzVBAh4vGHSrQyHUdBBPM"
+            }
+        }
+    ]
 }
-		</pre>
-		<p>
-			Processing agents should probably also check that the DIDs and
-			Keys the thing was issued to match what the Holder asked for...
-		</p>
-		<p>
-			Holders (or EDVs) SHOULD iterate through the <code>vcs</code> array
-			and store the associated credentials.
-		</p>
-		<p class="issue"> 
-			Do we want to include a 'revocation' field, where a previous VC ID
-			can be indicated as 'revoked'? This would be an OPTIONAL field, and
-			complicate the processing of these messages... 
-		</p>
-	</section>
+        </pre>
+        <p>
+            Processing agents should probably also check that the DIDs and
+            Keys the thing was issued to match what the Holder asked for...
+        </p>
+        <p>
+            Holders (or EDVs) SHOULD iterate through the <code>vcs</code> array
+            and store the associated credentials.
+        </p>
+        <p class="issue"> 
+            Do we want to include a 'revocation' field, where a previous VC ID
+            can be indicated as 'revoked'? This would be an OPTIONAL field, and
+            complicate the processing of these messages... 
+        </p>
+    </section>
 </section>
 <section>
-	<h1>Presentation Messages</h1>
+    <h1>Presentation Messages</h1>
 
 </section>
-	
-	
+    
+    
 <hr/>
 
 <section id="security-privacy-considerations">
@@ -999,18 +999,18 @@ vc-ql : {
 <p>I'm sure it's fine.</p>
 </section>
 <section class="appendix">
-	<h1>Resources</h1>
-	<p class="note">
-		Need to include the authors in these credits!
-	</p>
-	<ol>
-		<li><a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data Model v1.0</a></li>
-		<li><a href="https://">Decentrialized Identifiers</a></li>
-		<li><a href="https://github.com/hyperledger/aries-rfcs/blob/master/features/0023-did-exchange/README.md">Aries RFC 0023: DID Exchange Protocol 1.0</a></li>
-		<li><a href="https://github.com/hyperledger/aries-rfcs/blob/master/features/0036-issue-credential/README.md">Aries RFC 0036: Issue Credential Protocol 1.0</a></li>
-		<li><a href="https://github.com/hyperledger/aries-rfcs/blob/master/features/0037-present-proof/README.md">Aries RFC 0037: Present Proof Protocol 1.0</a></li>
-		<li><a href="https://digitalbazaar.github.io/did-method-key/">did:key Method 07</a></li>
-	</ol>
+    <h1>Resources</h1>
+    <p class="note">
+        Need to include the authors in these credits!
+    </p>
+    <ol>
+        <li><a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data Model v1.0</a></li>
+        <li><a href="https://">Decentrialized Identifiers</a></li>
+        <li><a href="https://github.com/hyperledger/aries-rfcs/blob/master/features/0023-did-exchange/README.md">Aries RFC 0023: DID Exchange Protocol 1.0</a></li>
+        <li><a href="https://github.com/hyperledger/aries-rfcs/blob/master/features/0036-issue-credential/README.md">Aries RFC 0036: Issue Credential Protocol 1.0</a></li>
+        <li><a href="https://github.com/hyperledger/aries-rfcs/blob/master/features/0037-present-proof/README.md">Aries RFC 0037: Present Proof Protocol 1.0</a></li>
+        <li><a href="https://digitalbazaar.github.io/did-method-key/">did:key Method 07</a></li>
+    </ol>
 </section>
 
 </body>
