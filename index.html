@@ -97,7 +97,7 @@
     <section id='abstract'>
       <p>
           A common protocol for decentralized entities to exchange 
-          Verifiable Credentials across various communcation channels.
+          Verifiable Credentials across various communication channels.
       </p>
     </section>
 
@@ -121,7 +121,7 @@
 
       <p>
       Work on this specification has also been supported by the Department of
-      Homeland Security SVIP program, the Decenralized Identity Foundation (hopefully)
+      Homeland Security SVIP program, the Decentralized Identity Foundation (hopefully)
       and the Hyperledger Aries community (blockcert?).
       </p>
     </section>
@@ -132,7 +132,7 @@
     <p>
         The objective of this specification is to define a common, minimalist message 
         protocol for Issuers, Holders and Verifiers for the purpose of requesting
-        and exchanging W3C Verifiable Credenitals and Presentations across technology
+        and exchanging W3C Verifiable Credentials and Presentations across technology
         boundaries.
     </p>
     <p>
@@ -150,7 +150,7 @@
         used. Most of these protocols provide a high degree of flexibility in
         there message structure, making them useful beyond Verifiable 
         Credentials. This protocol will therefore treat these generic transfer
-        teschnologies as <em>Communication Channels</em> - or 'pipes' for 
+        technologies as <em>Communication Channels</em> - or 'pipes' for 
         facilitating message transfer. This will allow developers to build
         Verifiable Credential based systems in a way that they are guaranteed
         some level of interoperability decoupled from more feature rich protocols
@@ -172,7 +172,7 @@
         <ul>
             <li>Verifiable Credentials v1.0 proof formats: LD-Signatures, 
                 ZKP, and JWS.</li>
-            <li>Credential Handler API browser extention.</li>
+            <li>Credential Handler API browser extension.</li>
             <li>Hyperledger Aries DIDComm.</li>
             <li>OAuth "3" transactional authorization.</li>
             <li>Blockcert ...?</li>
@@ -187,17 +187,17 @@
     <p>
         Out of scope for this specification are the details of how various 
         technologies make use of Encrypted Data Vaults, message routing or 
-        proxying, multi-party (3+) extentitions, and Verifiable Presentation
+        proxying, multi-party (3+) extensions, and Verifiable Presentation
         privacy considerations (unless they are part of the message structure).
     </p>
     <p>
         Note it is also possible that during the course of this messaging 
-        entities may determin they cannot interoperate due to the nature of the
+        entities may determine they cannot interoperate due to the nature of the
         schemas and formats of the Verifiable Credentials being exchanged; this
-        is an unfortuante but acceptable outcome. For example, a Holder simply
+        is an unfortunate but acceptable outcome. For example, a Holder simply
         may not have the Credentials matching the requested Schema by the 
         Verifier. The Issuer may not be able to support a particular signing 
-        algortithm required by the Holder. C'est la vie.
+        algorithm required by the Holder. C'est la vie.
     </p>
     <section>
         <h2>Layering</h2>
@@ -206,7 +206,7 @@
             v1.0 data format, the various Communication technologies and the transport
             layers. The following diagram is a visual (but not exhaustive) representation
             of how the various components in a Decentralized Identity ecosystem fit. 
-            Your milage may vary. 
+            Your mileage may vary. 
         </p>
         <figure id="figure-protocol-stack">
             <img style="margin: auto; display: block; width: 100%;" src="diagrams/vc-protocol-stack.png"
@@ -218,7 +218,7 @@
         <P>
             When the protocol can be used in conjunction with a particular message
             transport technology, this is referred to as a <em>binding.</em> Sample 
-            bindings are included in the Annex, and may be expressed as separate specs.
+            bindings are included in the Annex, and may be expressed as separate specifications.
         </P>
     </section>
     <section id="conformance">
@@ -230,42 +230,42 @@
 <section id="terminology">
     <h1>Terminology</h1>
 
-    This specification makes use of the terms defined in Verified Credenitals
-    Data Model v1.0 and defines the additonal terms:
+    This specification makes use of the terms defined in Verified Credentials
+    Data Model v1.0 and defines the additional terms:
     <dl>
         <dt><dfn>Binding</dfn></dt>
         <dd>A concrete mechanism through which a <a>Holder</a> invokes a 
             <a>Comm Channel</a>. For example, the <a href="#bindings-https">HTTP(S) Binding</a>.
         </dd>
         <dt><dfn>claim</dfn></dt>
-        <dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+        <dd>As in the Verifiable Credentials Data Model 1.0 spec.</dd>
         <dt><dfn>Comm Channel</dfn></dt>
         <dd>A 'transport protocol' for enabling the transfer of Verifiable 
             Credentials and other data. These Comm Channels may enable other 
             processing capabilities for DIDs and Verifiable Credentials 
             beyond this specification. In this context these Comm Channels
-            may already be sophistcated application protocols high on the OSI
+            may already be sophisticated application protocols high on the OSI
             stack, and must not be confused with lower level packet transport
             protocols.
         </dd>
         <dt><dfn>Controller</dfn></dt>
-        <dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+        <dd>As in the Verifiable Credentials Data Model 1.0 spec.</dd>
         <dt><dfn>Duplex</dfn></dt>
-        <dd>A 'two-way' message. This message type has a request and and expected response.</dd>
+        <dd>A 'two-way' message. This message type has a request and expected response.</dd>
         <dt><dfn>Holder</dfn></dt>
-        <dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+        <dd>As in the Verifiable Credentials Data Model 1.0 spec.</dd>
         <dt><dfn>Issuer</dfn></dt>
-        <dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+        <dd>As in the Verifiable Credentials Data Model 1.0 spec.</dd>
         <dt><dfn>property</dfn></dt>
-        <dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+        <dd>As in the Verifiable Credentials Data Model 1.0 spec.</dd>
         <dt><dfn>Simplex</dfn></dt>
         <dd>A 'one-way' message. This message does not have a defined response from the receiver.</dd>
         <dt><dfn>Subject</dfn></dt>
-        <dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+        <dd>As in the Verifiable Credentials Data Model 1.0 spec.</dd>
         <dt><dfn>Verifiable Credential</dfn></dt>
-        <dd>See Verfiable Credentials Data Model 1.0 spec.</dd>
+        <dd>See Verifiable Credentials Data Model 1.0 spec.</dd>
         <dt><dfn>Verifier</dfn></dt>
-        <dd>As in the Verifiable Credenitals Data Model 1.0 spec.</dd>
+        <dd>As in the Verifiable Credentials Data Model 1.0 spec.</dd>
     </dl>
 
 </section>
@@ -326,8 +326,8 @@
             </dd>
             <dt>Store Credential (duplex)</dt>
             <dd>The Issuer is ready to provide a Verifiable Credential for use/storage
-                at the Holder. The Holder can accept the Credenital, or provide back 
-                a Credential Params response if neccessary (for example,
+                at the Holder. The Holder can accept the Credential, or provide back 
+                a Credential Params response if necessary (for example,
                 extra data to create the necessary cryptographic proofs).
             </dd>
         </dl>
@@ -384,11 +384,11 @@
 <p>
     The following are use cases this Protocol looks to enable. It should be noted 
     reiterated that although there are already <a>Comm Channels</a> which may
-    enable some of these use cases, the goal of this Protocol is interoperabilty
+    enable some of these use cases, the goal of this Protocol is interoperability
     across <a>Comm Channels</a>.
 </p>
 <p>
-    <em>Scenario 1: Web Browser only</em>.  In browser Javascipt/plugin enables
+    <em>Scenario 1: Web Browser only</em>.  In browser JavaScript/plugin enables
     Credential exchange.
 </p>
 <p>
@@ -423,12 +423,12 @@
 <ul>
     <li>Pure JSON based messages. No special tags or semantics to support 
         JSON-LD(@) or DIDComm(~). This protocol MUST be translatable to 
-        CBOR for low bandwith Comm Channels.
+        CBOR for low bandwidth Comm Channels.
     </li>
     <li>
         Message integrity and confidentiality (signing and encryption) is assumed to 
         be a function of the <a>Comm Channel</a> and binding. If the <a>Comm Channel</a>
-        is not protecting messages in this way (or additonal cryptographic
+        is not protecting messages in this way (or additional cryptographic
         integrity is required), the JOSE and COSE signing and encryption
         payloads MUST be used.
     </li>
@@ -446,11 +446,11 @@
         of discovery and connection bootstrapping by a Holder.
         </p>
         <p>
-            This message may be static and generaly available, or it may be 
+            This message may be static and generally available, or it may be 
             generated in the context of a session, a transaction, or periodically.
         </p>
         <p class="note"> 
-            Need to determin what belongs here and what remains the the DID Document.
+            Need to determine what belongs here and what remains the DID Document.
         </p>
         <dl>
             <dt>type</dt>
@@ -560,7 +560,7 @@
                 compatible binding, the Holder MUST inform the user of the error
                 and stop processing.
             </li>
-            <li>MUST process the <code>credentials</code> array and determin if those
+            <li>MUST process the <code>credentials</code> array and determine if those
                 Credential types are applicable for the Holder.</li>
         </ol>
     </section>
@@ -592,7 +592,7 @@
                     in the Verifiable Credentials as the <code>credentialSubject</code>.
                     </p>
                     <p class="issue">
-                        Why am I using diffent terms then the Verifiable Credntials spec? 
+                        Why am I using different terms then the Verifiable Credentials spec? 
                         The answer is 'brevity for low bandwidth Comm Channels' but is that valid?
                     </p>
                 </dd>
@@ -601,7 +601,7 @@
                 <dt>enk</dt>
                 <dd>OPTIONAL. The encryption key to use when sending encrypted payloads,
                     if the Comm Channel is not fully trusted.
-                    This MUST be assocaited to the <code>sub</code> URI - for example, 
+                    This MUST be associated to the <code>sub</code> URI - for example, 
                     a key defined in the DID Document.
                 </dd>
                 <dt>params</dt>
@@ -610,7 +610,7 @@
                     introduction if the Holder knows a-priori that they will be required.
                     If this message is in response to a previous <code>issue-introduce-continue</code> result,
                     this object holds the required parameters to complete the introduction
-                    (or continue negotation).
+                    (or continue negotiation).
                     </p>
                     <p>
                     For example, attestations as to the type of software acting as a 
@@ -638,7 +638,7 @@
                 <li>MUST ensure the JWS/E header is using a <code>kid</code> associated to the <code>sub</code> URI.
                     For example, by dereferencing a DID and locating the key in the DID Document.
                 </li>
-                <li>MUST ignore the <code>params</code> field if no additonal parameters are expected.</li>
+                <li>MUST ignore the <code>params</code> field if no additional parameters are expected.</li>
                 <li>If processing the <code>params</code> field, only process expected fields and MUST ignore others it does not recognize.</li>
             </ol>
         </section>
@@ -691,7 +691,7 @@
                 subsequent message.
             </p>
             <p class="issue">
-                Does this protocl need the concept of DIDComm threading? Ideally Comm channels
+                Does this protocol need the concept of DIDComm threading? Ideally Comm channels
                 can handle that... 
             </p>
         </section>
@@ -723,7 +723,7 @@
         </p>
         <p>
             Examples include the use of TLS certificates, providing Verifiable
-            Credenitals issued from a shared Trust authority, providing 
+            Credentials issued from a shared Trust authority, providing 
             attestation certificates such as in [[Web AuthN]], the exchange of
             shared secrets or other credentials, or even in-person, physical trust
             establishment (like a certification sticker on a barcode reader).
@@ -739,15 +739,15 @@
             In workflows where a Holder is actively trying to collect credentials
             from Issuers and the Comm Channel allows for the Holder to reach
             out to the Issuer, this message MAY be used. This message MAY be used
-            in scenarios where additonal Holder to Issuer messages are required
+            in scenarios where additional Holder to Issuer messages are required
             to generate the Credential, for example in Zero Knowledge Proof 
             scenarios.
         </p>
         <p>
             In workflows where the Issuer is interacting with the user and then
-            offers to provide a Credenital to the user's Holder, for example
+            offers to provide a Credential to the user's Holder, for example
             at a physical kiosk or a website, the Issuer may interact with the user
-            to determin the parameters of the Credenital it is willing to issue,
+            to determine the parameters of the Credential it is willing to issue,
             then skip right to the Store Credential message.
         </p>
         <section id="issue-create-cred-req">
@@ -779,7 +779,7 @@
             <dl>
                 <dt>type</dt>
                 <dd>REQUIRED. MUST be set to <code>issue-credential-request</code>.</dd>
-                <p class="issue">Does <code>type</code> make sense w/o <code>@context</code>?</p>
+                <p class="issue">Does <code>type</code> make sense with out <code>@context</code>?</p>
             
                 <dt>sub</dt>
                 <dd>
@@ -856,17 +856,17 @@
                 <li><code>credentials.type</code> MUST contain <code>VerifiableCredential</code></li>
                 <li><code>credential.type</code> MUST contain only Credential schemas supported by the Issuer.</li>
                 <li><code>credential.id</code> MUST be a URI <em>controlled</em> by the Holder and linked to the <code>sub</code>.</li>
-                <li>The Issuer MUST only include <code>credential.claims</code> assocaited to the schema, and no more. Schema specific properly matching (i.e. beyond the property name) is outside the scope of this specificiation.</li>
+                <li>The Issuer MUST only include <code>credential.claims</code> associated to the schema, and no more. Schema specific properly matching (i.e. beyond the property name) is outside the scope of this specification.</li>
                 <li>The Issuer MUST ignore any <code>credential.params</code> it does not recognize.</li>
             </ol>
             <p>
-                Issuers MUST determin if there is enough "trust" in the Holder 
+                Issuers MUST determine if there is enough "trust" in the Holder 
                 (either through this session or a previous session) to issue the requested
                 credentials. 
             </p>
             <p>
-                Issuer MUST determin if they have enough information from the Subject or Holder
-                to issue the credential, or if additonal data is required. If the Issuer is 
+                Issuer MUST determine if they have enough information from the Subject or Holder
+                to issue the credential, or if additional data is required. If the Issuer is 
                 ready to issue the credential, it MAY respond with a <code>issue-credential-store</code>
                 response. If the Issuer requires
                 more information, it MAY return a <code>issue-credential-params</code> response
@@ -874,7 +874,7 @@
                 out-of-band from this protocol.
             </p>
             <p>
-                Issuers MUST determin if their own internal policies, and those of their 
+                Issuers MUST determine if their own internal policies, and those of their 
                 trust framework, are met for Credential issuance.
             </p>
         </section>
@@ -988,7 +988,35 @@ vc-ql : {
 </section>
 <section>
     <h1>Presentation Messages</h1>
-
+    <p>
+        These messages are exchanged when a Verifier wishes to request a 
+        Verifiable Presentation from a Holder. These are the major steps in
+        this process:
+    </p>
+    <ol>
+        <li>Verifier makes a request with its Identifier and contact endpoints,</li>
+        <li>
+            The Holder checks the request and determines if the Presenter is 
+            trusted to receive the Verifiable Presentation, 
+        </li>
+        <li>
+            Create the Verifiable Presentation with the appropriate disclosure
+            level of data, proof format and directed to the Verifier Identifier,
+        </li>
+        <li>
+            The Holder delivers the Verifiable Presentation to the Verifier over
+            the specified <a>Comm Channel</a>.
+        </li>
+        <li>
+            The Verifier determines the trust level of the Holder and Verifies 
+            the credential.
+        </li> 
+    </ol>
+    <p class="note">
+        There is not a risk of information leakage problem here if the Verifier
+        rejects the Holder/DID Method. Any data delivered to the Verifier is 
+        subject to the Verifier's data handling processes.  
+    </p>
 </section>
     
     
