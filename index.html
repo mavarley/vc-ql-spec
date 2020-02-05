@@ -457,7 +457,7 @@
             <dd>
                 REQUIRED. MUST be set to "issuer-invite".
             </dd>
-            <dt>iss</dt>
+            <dt>issuer</dt>
             <dd>
                 <p>
                 REQUIRED. MUST be set to a URI for the issuer. This MAY be a 
@@ -467,13 +467,16 @@
                 <p class="issue">
                     How do did:key and did:web fit in here?
                 </p>
+                <p class="note">
+                    Using "issuer" not JOSE "iss" because issuer has specific semantics for VCs.
+                </p>
             </dd>
             <dt>enk</dt>
             <dd>
                 OPTIONAL. MUST be a public key the Holder can use to encrypt
                 messages to the Issuer. This MAY be a JWK or a <code>did:key:...</code>
             </dd>
-            <dt>proofs</dt>
+            <dt>formats</dt>
             <dd>
                 <p>
                 REQUIRED. An array of the supported formats of Verifiable Credential
@@ -483,7 +486,7 @@
                     <li><code>zkp</code>: for zero knowledge proofs.</li>
                     <li><code>ldsig</code>: for LD-Signature proofs.</li>
                     <li><code>jws</code>: for inline JWS proofs.</li>
-                    <li><code>jwsd</code>: for detached JWS signature proofs. (is this a defined thing in v1.0?)</li>
+                    <li><code>jwsd</code>: for detached JWS signature proofs. (is this a defined thing in v1.0? Or just LD?)</li>
                 </ul>
             </dd>
             <dt>bindings</dt>
@@ -510,9 +513,9 @@
         <pre class="example no-highlight" title="Sample Issuer Invitiation">
 "vc-ql": {
     "type": "issuer-invite",
-    "iss" : "did:example:IiI",
+    "issuer" : "did:example:IiI",
     "enk": "did:key:z6eu48rjfdi39djdiod9de9wjwid9d",
-    "proofs" : [ "zkp", "ldsig", "jws", "jwsd" ],
+    "formats" : [ "zkp", "ldsig", "jws", "jwsd" ],
     "bindings": [
         { "scheme": "https", "params" : { "endpoint: "https://issuer.org/request"} },
         { "scheme": "didcomm", "params" : { "@type" : "https://didcomm.org/didexchange/1.0/invitation", ...} },
@@ -796,7 +799,8 @@
                     used in the Verifiable Credential. 
                 </dd>
                 <p class="Issue">Hmm, like Subject, do we need to have multiplicity here?</p>
-                
+                <dt>format</dt>
+                <dd>The Verifiable Credential format the Holder wishes to receive. MUST only be one format type.</dd>
                 <dt>credentials</dt>
                 <dd>
                     <p>REQUIRED. A non-empty array of credential types the Holder is requesting.</p>
@@ -819,7 +823,7 @@
     "type" : "issue-credential-request",
     "sub" : "did:example:Udid99",
     "aud" : "did:example:IiI",
-    "proof" : "ld-proof",
+    "format" : "ld-proof",
     "credentials" : [ 
         { 
             "type" : [ "VerifiableCredential", "UniversityDegreeCredential" ],
@@ -852,6 +856,7 @@
                 <li><code>type</code> MUST be <code>issue-credential-request</code>.</li>
                 <li><code>sub</code> MUST be known to the Issuer through an <code>issuer-introduce</code> message.</li>
                 <li><code>aud</code> Issuer MUST be a controller of the identifier URI.</li>
+                <li>Issuer MUST support the requested proof <code>format</code>.
                 <li><code>credentials</code> MUST not be empty.</li>
                 <li><code>credentials.type</code> MUST contain <code>VerifiableCredential</code></li>
                 <li><code>credential.type</code> MUST contain only Credential schemas supported by the Issuer.</li>
@@ -893,11 +898,19 @@
                 specification, but should they be? Do we need to define at least a
                 couple "useful" ones?
             </p>
+            <dt>type</dt>
+            <dd> MUST be <code>issue-credentials-params</code>.</dd>
+            <dt>aud</dt>
+            <dd>The audience for this message.</dd>
+            <dt>issuer</dt>
+            <dd>The issuer sending this message</dd>
+            <dt>credentials</dt>
+            <dd>The requested credentials and the associated params. (TBD). </dd>
             <pre class="example no-highlight" title="intro accepted response">
 "vc-ql": {
     "type" : "issue-credentials-params",
     "aud" : "did:example:Udid99",
-    "iss" : "did:example:IiI",
+    "issuer" : "did:example:IiI",
     "credentials" : [ 
         { 
             "type" : [ "VerifiableCredential", "UniversityDegree" ],
@@ -1014,9 +1027,140 @@ vc-ql : {
     </ol>
     <p class="note">
         There is not a risk of information leakage problem here if the Verifier
-        rejects the Holder/DID Method. Any data delivered to the Verifier is 
-        subject to the Verifier's data handling processes.  
+        rejects the Holder/DID Method (i.e. receives information it will not be able to use).
+        Any data delivered to the Verifier is subject to the Verifier's data handling processes.  
     </p>
+    <section id="verifier-request">
+        <h2>Presentation Request</h2>
+        <p>
+            A <a>Verifier</a> first needs to generate Verifiable Presentation request to provide
+            to the Holder to process. The format of the request is as follows:
+        </p> 
+        <p class="note">
+            Unorganized notes.
+        Verifier instead of classic JSON "iss" because "issuer" is an overloaded term.
+        returnURI - this can be a DID or a URL -- is this part of the Comm Layer?
+        purposeURI - did or URL with standard language.
+        "reason" - do we really need a reason for each schema?
+
+        delegated flag?
+
+        using credential.name instead of ID because processing the response will be
+        code looking for different credential types, not unique IDs.
+        </p>
+        <pre class="example no-highlight">
+
+"vq-rl" : {
+    "type" : "verifier-request",
+    "id" : "uuid:8D9FA614-71DC-4B4B-A243-5696FD98C408",
+    "verifier" : "did:example:VeR66"
+    "returnURI" : "did:example:VeR66/callback",
+    "purposeURI" : "did:example:3483898298381/purpose1",
+    "purposeText" : {
+        "en_ca" : "Membership Sign Up",
+        "en_fr" : "S'inscrire à l'adhésion"
+        "es_mx" : "Inscripción de membresía"
+    }
+    "formats" : [ "zkp","ldsig" ],
+    "genericParams" : { ... }
+    "strict" : true
+    "credentials" : [
+        {
+            "name" : "uniqueStringAssignedByVerifier",
+            "reason" : { 
+                "en_ca" : "Because I want it.",
+                "en_fr" : "parce que je le veux.",
+                "es_mx" : "Porque lo quiero"
+            },
+            "issuers" : [ "did:example:3483898298381/institution_list", "did:example:IiI" ],
+            "@context" : [ " "https://w3.org/2018/credentials/v1" ],
+            "type" : [ "VerifiableCredential", "UniversityDegree" ],
+            "claims" : [ "degree" ],
+            "required" : true,
+            "issuer_source" : true
+            "params" : { .. },
+        },
+        {
+            "name" : "AnotheruniqueStringAssignedByVerifier",
+            "issuers" : [ "did:example:3483898298381/passport_issuers" ],
+            "@context" : [ ],
+            "type" : [ "VerifiableCredential", "Personal" ],
+            "required" : true,
+        }
+    ],
+}
+
+        </pre>
+        <p class="note">
+            This spec does not allow for a rich query language, because it forces Holders 
+            to implement complex UIs. Verifiers either need the information they are asking for,
+            or they have determined through a UI session what this query must contain.
+            <a>Verifiers</a> own their business logic, not <a>Holders</a>.
+        </p>
+    </section>
+    <section id="verifier-params">
+    <h2>Presentation Parameters</h2>
+    <p>
+        In cases where the <a>Holder</a> requires more information from the <a>Verifier</a> 
+        to proceed with the Presentation. This could be parameters for the proof objects
+        or to establish <a id="#issue-boostrap-trust">trust</a>. 
+    </p>
+    <pre class="example no-highlight">
+"vq-rl" : {
+    "type" : "verifier-params",
+    "id" : "uuid:50AD9BCF-4D88-4605-9F9B-378A939F7999",
+    "requestId" : "uuid:8D9FA614-71DC-4B4B-A243-5696FD98C408",
+    "genericParams" : {
+        "myparam1" : { .. }
+    },
+    "presentationParams" : [
+        {
+            "name" : "uniqueStringAssignedByVerifier",
+            "params" : { ... }
+        },
+        {
+            "name" : "AnotheruniqueStringAssignedByVerifier",
+            "params" : { .. }
+        }
+    ]
+}
+    </pre>
+    <p>
+        <a>Verifiers</a> receiving a <code>verifier-params</code> response MUST re-issue
+        a <code>verifier-request</code> with the required parameters to the Holder if 
+        they can support the request.
+    </p>
+    </section>
+    <section id="verifier-response">
+        <h2>Presentation Response</h2>
+        <p>
+            This message contains the response to a Presentation Request (a 
+            <code>verifier-request</code>). In some cases "unsuccessful" responses
+            can be ignored, as the <a>Verifier</a> cannot proceed without 
+            the required data. In other cases an unsuccessful response MAY be provided
+            to the <a>Verifier</a> for cases where the <a>Verifier</a> is capable of
+            alternate business logic and success paths.
+        </p>
+        <pre class="example no-highlight">
+"vr-ql" : {
+    "type" : "verifier-response",
+    "id" : "uuid:50768C74-0D43-431C-B735-C26F37F58AF6",
+    "requestId" : "uuid:8D9FA614-71DC-4B4B-A243-5696FD98C408",
+    "result" : enum ["fail", "partial", "complete"],
+    "credentials" : [
+        {
+            "name" : "uniqueStringAssignedByVerifier",
+            "vp" : { ... },
+            "vpURI" : " my_edv_uri"
+        },
+        {
+            "name" : "AnotheruniqueStringAssignedByVerifier",
+            "error" : "unavailable"
+        }
+    ]
+}
+        </pre>
+    </section>
 </section>
     
     
@@ -1037,6 +1181,7 @@ vc-ql : {
         <li><a href="https://github.com/hyperledger/aries-rfcs/blob/master/features/0023-did-exchange/README.md">Aries RFC 0023: DID Exchange Protocol 1.0</a></li>
         <li><a href="https://github.com/hyperledger/aries-rfcs/blob/master/features/0036-issue-credential/README.md">Aries RFC 0036: Issue Credential Protocol 1.0</a></li>
         <li><a href="https://github.com/hyperledger/aries-rfcs/blob/master/features/0037-present-proof/README.md">Aries RFC 0037: Present Proof Protocol 1.0</a></li>
+        <li><a href="https://github.com/decentralized-identity/presentation-request/blob/master/proposals/presentation-message-format.md">Addition of Presentation Request/Response to the W3C Verifiable Credentials specification</a></li>
         <li><a href="https://digitalbazaar.github.io/did-method-key/">did:key Method 07</a></li>
     </ol>
 </section>
