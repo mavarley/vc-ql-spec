@@ -148,7 +148,7 @@
         data, for example Aries DIDComm and the Credential Handler API (CHAPI),
         and more popular frameworks like OAuth and OpenID Connect may also be
         used. Most of these protocols provide a high degree of flexibility in
-        there message structure, making them useful beyond Verifiable 
+        their message structure, making them useful beyond Verifiable 
         Credentials. This protocol will therefore treat these generic transfer
         technologies as <em>Communication Channels</em> - or 'pipes' for 
         facilitating message transfer. This will allow developers to build
@@ -250,16 +250,12 @@
         </dd>
         <dt><dfn>Controller</dfn></dt>
         <dd>As in the Verifiable Credentials Data Model 1.0 spec.</dd>
-        <dt><dfn>Duplex</dfn></dt>
-        <dd>A 'two-way' message. This message type has a request and expected response.</dd>
         <dt><dfn>Holder</dfn></dt>
         <dd>As in the Verifiable Credentials Data Model 1.0 spec.</dd>
         <dt><dfn>Issuer</dfn></dt>
         <dd>As in the Verifiable Credentials Data Model 1.0 spec.</dd>
         <dt><dfn>property</dfn></dt>
         <dd>As in the Verifiable Credentials Data Model 1.0 spec.</dd>
-        <dt><dfn>Simplex</dfn></dt>
-        <dd>A 'one-way' message. This message does not have a defined response from the receiver.</dd>
         <dt><dfn>Subject</dfn></dt>
         <dd>As in the Verifiable Credentials Data Model 1.0 spec.</dd>
         <dt><dfn>Verifiable Credential</dfn></dt>
@@ -294,13 +290,13 @@
     <section id="hl-issuance">
         <h2>Issuance Flow</h2>
         <dl>
-            <dt>Invite Message (simplex) (optional)</dt>
+            <dt>Invite Message (optional)</dt>
             <dd>An entity is willing to provide verifiable credentials to qualified
                 Holders. The Invitation message allows Holders to 'discover' how to 
                 communicate with an Issuer. "I invite Holders to Introduce themselves in 
                 this way."</dd>
 
-            <dt>Introduce Message (duplex)</dt>
+            <dt>Introduce Message</dt>
             <dd>Holders Introduce themselves to Issuers by providing details about 
                 "who they are" and "how to communicate with them" - Identity and 
                 Location.
@@ -311,20 +307,20 @@
                 protocols, Verifiable Credential exchange, or physical (in person)
                 trust. 
             </dd>
-            <dt>Create Credential (duplex)</dt>
+            <dt>Create Credential</dt>
             <dd>The Holder is requesting a Credential of a certain type, schema, 
                 and format. The Issuer processes the request and returns the 
                 Credential if possible. This message may be implied by the Issuer
                 as Credential parameters may be determined out-of-band of this 
                 protocol (through user experience, for example).
             </dd>
-            <dt>Credential Params (duplex)</dt>
+            <dt>Credential Params</dt>
             <dd>This message may be sent if in order to create a credential an 
                 Issuer and Holder need exchange additional information. This message
                 MAY be sent in response to either Create Credential or Store 
                 Credential messages, and MAY be exchanged as many times as necessary. 
             </dd>
-            <dt>Store Credential (duplex)</dt>
+            <dt>Store Credential</dt>
             <dd>The Issuer is ready to provide a Verifiable Credential for use/storage
                 at the Holder. The Holder can accept the Credential, or provide back 
                 a Credential Params response if necessary (for example,
@@ -343,20 +339,20 @@
         </figure>
         
         <dl>
-            <dt>Presentation Request (simplex)</dt>
+            <dt>Presentation Request</dt>
             <dd>The Verifier makes a Presentation Request with the desired
                 parameters to the Holder. A Presentation Request message may
                 be referenced in other Presentation messages, but itself does
                 not require a direct response. Presentation messages may be
                 cached, physically printed, implied, and so on.
             </dd>
-            <dt>Presentation Response (duplex)</dt>
+            <dt>Presentation Response</dt>
             <dd>
                 The Holder's Response for a Presentation Request. This may
                 contain the Credential Presentation, or provide information on how to
                 get the Credential Presentation.
             </dd>
-            <dt>Presentation Params (duplex) (optional)</dt>
+            <dt>Presentation Params (optional)</dt>
             <dd>
                 The Holder and Verifier MAY provide additional parameters relative
                 to the Presentation Response. Holders and Verifiers MAY exchange
@@ -368,7 +364,7 @@
             these custom details may simply be negotiated for a particular Comm Channel.
         </p>
         <dl>
-            <dt>Get Presentation (duplex) (optional)</dt>
+            <dt>Get Presentation (optional)</dt>
             <dd>An optional step where the Verifier is required to call out to 
                 an external entity to collect the data. For example, an 
                 Encrypted Data Vault or an Identity Hub or a Web Service, etc...
@@ -382,7 +378,7 @@
 <section id="use-cases">
 <h1>Use Cases</h1>
 <p>
-    The following are use cases this Protocol looks to enable. It should be noted 
+    The following are use cases this Protocol looks to enable. It should be  
     reiterated that although there are already <a>Comm Channels</a> which may
     enable some of these use cases, the goal of this Protocol is interoperability
     across <a>Comm Channels</a>.
