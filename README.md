@@ -1,3 +1,10 @@
+# CURRENTLY DEFUNCT
+This work is not currently being maintained.
+
+Through the process of developing this draft, I discovered that in order to find alignment
+across the range of existing attempts, the 'protocol' became so abstract as to be superflous.
+This repository will remain for a time as reference only.
+
 ## Verifiable Credenitals Query Language 
 View the latest rendering here: https://mavarley.github.io/vc-ql-spec/
 
